@@ -1,7 +1,7 @@
 # Проект «Киноман»
 
-* Студент: [Stanislav Byneev](https://up.htmlacademy.ru/ecmascript/15/user/1810789).
-* Наставник: `Неизвестно`.
+- Студент: [Stanislav Byneev](https://up.htmlacademy.ru/ecmascript/15/user/1810789).
+- Наставник: `Rail Sakhaviev`.
 
 ---
 
