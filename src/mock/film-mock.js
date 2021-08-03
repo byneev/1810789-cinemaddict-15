@@ -2,6 +2,12 @@ import dayjs from 'dayjs';
 import { ACTORS, COUNTRIES, ORIGINAL_TITLES, PARAGRAPHS, POSTERS, PRODUCERS } from '../constants.js';
 import { GENRES } from '../constants.js';
 import { getRandomFloat, getRandomInteger } from '../utils.js';
+import { generateComment } from './comment-mock.js';
+
+const comments = [];
+for (let i = 0; i < 90; i++) {
+  comments.push(generateComment());
+}
 
 const generateFilmPoster = () => `/images/posters/${POSTERS[getRandomInteger(0, POSTERS.length - 1)]}`;
 
@@ -64,14 +70,25 @@ const generateActors = () => {
 
 const generateCountry = () => COUNTRIES[getRandomInteger(0, COUNTRIES.length - 1)];
 
-const generateCommentsId = () => {
+const generateIdsList = () => {
   const resultArray = [];
-  for (let i = 1; i < 20; i++) {
-    if (getRandomInteger(1, 5) === 1) {
-      resultArray.push(i);
+  for (const comment in comments) {
+    const id = comment;
+    if (getRandomInteger(1, 30) === 1) {
+      resultArray.push(id);
     }
   }
   return resultArray.slice(0, 5);
+};
+
+const generateUserDetails = () => {
+  const isWatched = Boolean(getRandomInteger());
+  return {
+    isWatched: isWatched,
+    isInWatchlist: !isWatched,
+    isFavorite: Boolean(getRandomInteger()),
+    watchingDate: isWatched ? dayjs().add(-getRandomInteger(1, 1000), 'day').toDate() : null,
+  };
 };
 
 const generateFilm = () => {
@@ -89,11 +106,9 @@ const generateFilm = () => {
     producer: generateProducer(),
     actors: generateActors(),
     country: generateCountry(),
-    ageRating: getRandomInteger(0, 21),
-    isWatched: Boolean(getRandomInteger()),
-    isFavorite: Boolean(getRandomInteger()),
-    isInWatchlist: Boolean(getRandomInteger()),
-    comments: generateCommentsId(),
+    ageRating: getRandomInteger(0, 100),
+    userDetails: generateUserDetails(),
+    comments: generateIdsList(),
   };
 };
 

@@ -66,3 +66,32 @@ export const WRITERS = [
 ];
 
 export const COUNTRIES = ['Canada', 'Italy', 'Uzbekistan', 'Turkey', 'Russia', 'United States', 'Sweden', 'France', 'Poland'];
+
+export const AUTHORS = [
+  'Dmitry Valov',
+  'Oleg Prishepa',
+  'Mike Dronov',
+  'Sam Bibop',
+  'Andy Drake',
+  'Samanta Olice',
+  'Mary Jane',
+  'Olivia Shade',
+  'Patrick Dosntmatter',
+  'Katrin Dzuba',
+  'Shaya Nayton',
+];
+
+export const MESSAGES = [
+  'Omg its so cute',
+  'You are amazing',
+  'Worst photo ever',
+  'Do you like eating, isnt it?',
+  'Just delete you account, buddy',
+  'Can I have your number?',
+  'Nice filters, old scrub',
+  'Good luck, have fun!',
+  'Play with me, pls',
+  'I dont know why you even doing this',
+];
+
+export const EMOTIONS = ['smile', 'sleeping', 'puke', 'angry'];
