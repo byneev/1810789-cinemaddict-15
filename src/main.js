@@ -5,6 +5,7 @@ import { getFilmsList, getFilmsListExtra } from './view/films-list.js';
 import { getFilmCards } from './view/film-card.js';
 import { getMoreBtn } from './view/more-btn.js';
 import { getFilmsAmount } from './view/films-amount.js';
+import { generateFilm } from './mock/film-mock.js';
 
 const addElement = (container, markup, place = 'beforeend') => {
   container.insertAdjacentHTML(place, markup);
@@ -36,3 +37,5 @@ const extraFilmLists = mainElement.querySelectorAll('.films-list--extra');
 const footerStatWrapper = document.querySelector('.footer__statistics');
 
 addElement(footerStatWrapper, getFilmsAmount());
+
+console.log(generateFilm());

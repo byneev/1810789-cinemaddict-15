@@ -1,3 +1,5 @@
-const getRandomInteger = (start, end) => Math.floor(start + Math.random() * (end - start + 1));
+const getRandomInteger = (start = 0, end = 1) => Math.floor(start + Math.random() * (end - start + 1));
 
-export { getRandomInteger };
+const getRandomFloat = (start = 0, end = 10, count = 1) => (start + Math.random() * (end - start)).toFixed(count);
+
+export { getRandomInteger, getRandomFloat };
