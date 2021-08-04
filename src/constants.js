@@ -1,6 +1,6 @@
 export const POSTERS = [
   'made-for-each-other.png',
-  'popeye-meets-sindbad.png',
+  'popeye-meets-sinbad.png',
   'sagebrush-trail.jpg',
   'santa-claus-conquers-the-martians.jpg',
   'the-dance-of-life.jpg',
@@ -83,15 +83,15 @@ export const AUTHORS = [
 
 export const MESSAGES = [
   'Omg its so cute',
-  'You are amazing',
-  'Worst photo ever',
-  'Do you like eating, isnt it?',
-  'Just delete you account, buddy',
-  'Can I have your number?',
-  'Nice filters, old scrub',
+  'Amazing!',
+  'Worst film ever',
+  'Actors like eating, isnt it?',
+  'Just delete you account, producer',
+  'Can I have sequel ?',
+  'Writers - old scrubs',
   'Good luck, have fun!',
-  'Play with me, pls',
-  'I dont know why you even doing this',
+  'More, pls',
+  'I dont know why you even show me this one. OMG!',
 ];
 
 export const EMOTIONS = ['smile', 'sleeping', 'puke', 'angry'];
