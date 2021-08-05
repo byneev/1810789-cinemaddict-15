@@ -6,7 +6,7 @@ import { getFilmCard } from './view/film-card.js';
 import { getMoreBtn } from './view/more-btn.js';
 import { generateFilm } from './mock/film-mock.js';
 import { getFilmPopup } from './view/film-popup.js';
-import { getCountByFilters } from './mock/filters-mock.js';
+import { getFilmsAmount } from './view/films-amount.js';
 
 const addElement = (container, markup, place = 'beforeend') => {
   container.insertAdjacentHTML(place, markup);
@@ -15,7 +15,7 @@ const addElement = (container, markup, place = 'beforeend') => {
 const mainElement = document.querySelector('.main');
 const headerElement = document.querySelector('.header');
 
-addElement(headerElement, getProfile());
+// addElement(headerElement, getProfile());
 addElement(mainElement, getSort());
 addElement(mainElement, getFilmsList());
 
@@ -32,6 +32,7 @@ const MAX_FILM_COUNT = 5;
 for (let i = 0; i < Math.min(films.length, MAX_FILM_COUNT); i++) {
   addElement(filmListElement, getFilmCard(films[i]));
 }
+addElement(headerElement, getProfile(films));
 // add more btn if not all were shown
 if (films.length > MAX_FILM_COUNT) {
   addElement(filmsList, getMoreBtn());
@@ -48,7 +49,7 @@ moreBtn.addEventListener('click', (evt) => {
   }
 });
 
-addElement(mainElement, getSiteMenu(getCountByFilters(films)), 'afterbegin');
+addElement(mainElement, getSiteMenu(films), 'afterbegin');
 // UNCOMMENT FOR POPUP
 addElement(mainElement, getFilmPopup(films[0]));
 
@@ -56,4 +57,4 @@ addElement(filmsList, getFilmsListExtra('Most commented'), 'afterend');
 addElement(filmsList, getFilmsListExtra('Top rated'), 'afterend');
 
 const footerStatistics = document.querySelector('.footer__statistics');
-addElement(footerStatistics, `<p>${films.length} movies inside</p>`);
+addElement(footerStatistics, getFilmsAmount(films));

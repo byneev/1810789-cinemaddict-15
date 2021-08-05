@@ -19,7 +19,7 @@ const generateOriginalTitle = () => ORIGINAL_TITLES[getRandomInteger(0, ORIGINAL
 const generateReleaseYear = () => dayjs().add(-getRandomInteger(1, 90), 'year').toDate();
 
 const generateRuntime = () => {
-  const runtimesAll = getRandomInteger(0, 120);
+  const runtimesAll = getRandomInteger(20, 120);
   const runtimeHours = runtimesAll / 60;
   return runtimeHours < 1 ? `${runtimesAll}m` : `${Math.floor(runtimeHours)}h ${runtimesAll % 60}m`;
 };
