@@ -2,26 +2,11 @@ const getRandomInteger = (start = 0, end = 1) => Math.floor(start + Math.random(
 
 const getRandomFloat = (start = 4, end = 10, count = 1) => (start + Math.random() * (end - start)).toFixed(count);
 
-const ids = [];
-const commentIds = [];
+let idCount = 0;
+let commentIdCount = 0;
 
-const generateId = () => {
-  let id;
-  do {
-    id = getRandomInteger(1, 100);
-  } while (ids.includes(id));
-  ids.push(id);
-  return id;
-};
-
-const generateCommentId = () => {
-  let id;
-  do {
-    id = getRandomInteger(1, 100);
-  } while (commentIds.includes(id));
-  commentIds.push(id);
-  return id;
-};
+const generateId = () => ++idCount;
+const generateCommentId = () => ++commentIdCount;
 
 const generateValuesFromArray = (array) => {
   const resultArray = [];

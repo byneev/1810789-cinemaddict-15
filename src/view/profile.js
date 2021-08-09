@@ -9,7 +9,7 @@ const getProfile = (films) => {
   let profileString;
   if (isWatchedCount > 0 && isWatchedCount <= 10) {
     profileString = 'novice';
-  } else if (isWatchedCount > 11 && isWatchedCount <= 20) {
+  } else if (isWatchedCount > 10 && isWatchedCount <= 20) {
     profileString = 'fan';
   } else if (isWatchedCount > 20) {
     profileString = 'movie buff';

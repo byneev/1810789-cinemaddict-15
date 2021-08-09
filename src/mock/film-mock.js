@@ -3,27 +3,6 @@ import { ACTORS, COUNTRIES, ORIGINAL_TITLES, PARAGRAPHS, POSTERS, PRODUCERS, WRI
 import { generateId, generateValuesFromArray, getRandomFloat, getRandomInteger } from '../utils.js';
 import { generateComment } from './comment-mock.js';
 
-const generateFilmPoster = () => `/images/posters/${POSTERS[getRandomInteger(0, POSTERS.length - 1)]}`;
-
-const generateTitleByPoster = (poster) => {
-  const filmTitleTemp = poster
-    .replace('/images/posters/', '')
-    .replace(/.jpg|.png/, '')
-    .split('-')
-    .join(' ');
-  return filmTitleTemp[0].toUpperCase() + filmTitleTemp.slice(1);
-};
-
-const generateOriginalTitle = () => ORIGINAL_TITLES[getRandomInteger(0, ORIGINAL_TITLES.length - 1)];
-
-const generateReleaseYear = () => dayjs().add(-getRandomInteger(1, 90), 'year').toDate();
-
-const generateRuntime = () => {
-  const runtimesAll = getRandomInteger(20, 120);
-  const runtimeHours = runtimesAll / 60;
-  return runtimeHours < 1 ? `${runtimesAll}m` : `${Math.floor(runtimeHours)}h ${runtimesAll % 60}m`;
-};
-
 const generateDescription = () => {
   const tempArray = [PARAGRAPHS[getRandomInteger(0, PARAGRAPHS.length - 1)]];
   for (const paragraph of PARAGRAPHS) {
@@ -33,10 +12,6 @@ const generateDescription = () => {
   }
   return tempArray.slice(0, 5).join(' ');
 };
-
-const generateProducer = () => PRODUCERS[getRandomInteger(0, PRODUCERS.length - 1)];
-
-const generateCountry = () => COUNTRIES[getRandomInteger(0, COUNTRIES.length - 1)];
 
 const generateUserDetails = () => {
   const isWatched = Boolean(getRandomInteger());
@@ -57,22 +32,28 @@ const generateComments = () => {
 };
 
 const generateFilm = () => {
-  const filmPoster = generateFilmPoster();
-
+  const filmPoster = `/images/posters/${POSTERS[getRandomInteger(0, POSTERS.length - 1)]}`;
+  const filmTitleTemp = filmPoster
+    .replace('/images/posters/', '')
+    .replace(/.jpg|.png/, '')
+    .split('-')
+    .join(' ');
+  const runtimesAll = getRandomInteger(20, 120);
+  const runtimeHours = runtimesAll / 60;
   return {
     id: generateId(),
     poster: filmPoster,
-    title: generateTitleByPoster(filmPoster),
-    originalTitle: generateOriginalTitle(),
+    title: filmTitleTemp[0].toUpperCase() + filmTitleTemp.slice(1),
+    originalTitle: ORIGINAL_TITLES[getRandomInteger(0, ORIGINAL_TITLES.length - 1)],
     rating: getRandomFloat(),
-    realiseDate: generateReleaseYear(),
-    runtime: generateRuntime(),
+    realiseDate: dayjs().add(-getRandomInteger(1, 90), 'year').toDate(),
+    runtime: runtimeHours < 1 ? `${runtimesAll}m` : `${Math.floor(runtimeHours)}h ${runtimesAll % 60}m`,
     genres: generateValuesFromArray(GENRES),
     description: generateDescription(),
-    producer: generateProducer(),
+    producer: PRODUCERS[getRandomInteger(0, PRODUCERS.length - 1)],
     actors: generateValuesFromArray(ACTORS),
     writers: generateValuesFromArray(WRITERS),
-    country: generateCountry(),
+    country: COUNTRIES[getRandomInteger(0, COUNTRIES.length - 1)],
     ageRating: getRandomInteger(0, 18),
     userDetails: generateUserDetails(),
     commentsList: generateComments(),
