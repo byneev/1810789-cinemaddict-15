@@ -1,4 +1,5 @@
-import { getCountByFilters } from '../mock/filters-mock';
+import { getCountByFilters } from '../mock/filters-mock.js';
+import { createElement } from '../utils.js';
 
 const getSiteMenu = (films) => {
   const countByFilters = getCountByFilters(films);
@@ -14,4 +15,24 @@ const getSiteMenu = (films) => {
 </nav>`;
 };
 
-export { getSiteMenu };
+export default class SiteMenu {
+  constructor(films) {
+    this._films = films;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return getSiteMenu(this._films);
+  }
+
+  getElement() {
+    if (!this._element) {
+      return createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

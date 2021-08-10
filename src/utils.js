@@ -1,3 +1,8 @@
+const RenderPosition = {
+  BEFOREEND: 'beforeend',
+  AFTERBEGIN: 'afterbegin',
+};
+
 const getRandomInteger = (start = 0, end = 1) => Math.floor(start + Math.random() * (end - start + 1));
 
 const getRandomFloat = (start = 4, end = 10, count = 1) => (start + Math.random() * (end - start)).toFixed(count);
@@ -21,4 +26,21 @@ const generateValuesFromArray = (array) => {
   return resultArray;
 };
 
-export { getRandomInteger, getRandomFloat, generateId, generateCommentId, generateValuesFromArray };
+const createElement = (template) => {
+  const temp = document.createElement('div');
+  temp.innerHTML = template;
+  return temp.firstChild;
+};
+
+const render = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+  }
+};
+
+export { getRandomInteger, getRandomFloat, generateId, generateCommentId, generateValuesFromArray, createElement, render, RenderPosition };
