@@ -7,12 +7,6 @@ const getRandomInteger = (start = 0, end = 1) => Math.floor(start + Math.random(
 
 const getRandomFloat = (start = 4, end = 10, count = 1) => (start + Math.random() * (end - start)).toFixed(count);
 
-let idCount = 0;
-let commentIdCount = 0;
-
-const generateId = () => ++idCount;
-const generateCommentId = () => ++commentIdCount;
-
 const generateValuesFromArray = (array) => {
   const resultArray = [];
   for (const item of array) {
@@ -43,4 +37,11 @@ const render = (container, element, place) => {
   }
 };
 
-export { getRandomInteger, getRandomFloat, generateId, generateCommentId, generateValuesFromArray, createElement, render, RenderPosition };
+const onCardClickHandler = (data, target, className, callback) => {
+  target.querySelector(className).addEventListener('click', (evt) => {
+    evt.preventDefault();
+    callback(data, evt.target);
+  });
+};
+
+export { getRandomInteger, getRandomFloat, generateValuesFromArray, createElement, render, RenderPosition, onCardClickHandler };

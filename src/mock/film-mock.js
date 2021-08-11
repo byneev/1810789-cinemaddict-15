@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { ACTORS, COUNTRIES, ORIGINAL_TITLES, PARAGRAPHS, POSTERS, PRODUCERS, WRITERS, GENRES } from '../constants.js';
-import { generateId, generateValuesFromArray, getRandomFloat, getRandomInteger } from '../utils.js';
+import { generateValuesFromArray, getRandomFloat, getRandomInteger } from '../utils.js';
 import { generateComment } from './comment-mock.js';
 
 const generateDescription = () => {
@@ -31,6 +31,7 @@ const generateComments = () => {
   return resultArray.slice(0, getRandomInteger(0, 5));
 };
 
+let id = 0;
 const generateFilm = () => {
   const filmPoster = `/images/posters/${POSTERS[getRandomInteger(0, POSTERS.length - 1)]}`;
   const filmTitleTemp = filmPoster
@@ -41,7 +42,7 @@ const generateFilm = () => {
   const runtimesAll = getRandomInteger(20, 120);
   const runtimeHours = runtimesAll / 60;
   return {
-    id: generateId(),
+    id: ++id,
     poster: filmPoster,
     title: filmTitleTemp[0].toUpperCase() + filmTitleTemp.slice(1),
     originalTitle: ORIGINAL_TITLES[getRandomInteger(0, ORIGINAL_TITLES.length - 1)],
