@@ -1,8 +1,3 @@
-const RenderPosition = {
-  BEFOREEND: 'beforeend',
-  AFTERBEGIN: 'afterbegin',
-};
-
 const getRandomInteger = (start = 0, end = 1) => Math.floor(start + Math.random() * (end - start + 1));
 
 const getRandomFloat = (start = 4, end = 10, count = 1) => (start + Math.random() * (end - start)).toFixed(count);
@@ -26,22 +21,4 @@ const createElement = (template) => {
   return temp.firstChild;
 };
 
-const render = (container, element, place) => {
-  switch (place) {
-    case RenderPosition.AFTERBEGIN:
-      container.prepend(element);
-      break;
-    case RenderPosition.BEFOREEND:
-      container.append(element);
-      break;
-  }
-};
-
-const onCardClickHandler = (data, target, className, callback) => {
-  target.querySelector(className).addEventListener('click', (evt) => {
-    evt.preventDefault();
-    callback(data, evt.target);
-  });
-};
-
-export { getRandomInteger, getRandomFloat, generateValuesFromArray, createElement, render, RenderPosition, onCardClickHandler };
+export { getRandomInteger, getRandomFloat, generateValuesFromArray, createElement, onCardClickHandler };

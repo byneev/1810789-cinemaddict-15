@@ -1,25 +1,15 @@
 import { createElement } from '../utils.js';
+import AbstractElement from './abstract-element.js';
 
 const getFilmsAmount = (films) => `<p>${films.length} movies inside</p>`;
 
-export default class FilmsAmount {
+export default class FilmsAmount extends AbstractElement {
   constructor(films) {
+    super();
     this._films = films;
-    this._element = null;
   }
 
   getTemplate() {
     return getFilmsAmount(this._films);
-  }
-
-  getElement() {
-    if (!this._element) {
-      return createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
