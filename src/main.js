@@ -2,8 +2,10 @@ import { getProfile } from './view/profile.js';
 import { getSiteMenu } from './view/site-menu.js';
 import { getSort } from './view/sort.js';
 import { getFilmsList, getFilmsListExtra } from './view/films-list.js';
-import { getFilmCards } from './view/film-card.js';
-import { getMoreBtn } from './view/more-btn.js';
+import { getFilmCard } from './view/film-card.js';
+import { getMoreButton } from './view/more-button.js';
+import { generateFilm } from './mock/film-mock.js';
+import { getFilmPopup } from './view/film-popup.js';
 import { getFilmsAmount } from './view/films-amount.js';
 
 const addElement = (container, markup, place = 'beforeend') => {
@@ -13,26 +15,39 @@ const addElement = (container, markup, place = 'beforeend') => {
 const mainElement = document.querySelector('.main');
 const headerElement = document.querySelector('.header');
 
-addElement(headerElement, getProfile());
-addElement(mainElement, getSiteMenu());
 addElement(mainElement, getSort());
 addElement(mainElement, getFilmsList());
 
 const filmsList = mainElement.querySelector('.films-list');
 const filmListElement = filmsList.querySelector('.films-list__container');
+const films = [];
+for (let i = 0; i < 20; i++) {
+  films.push(generateFilm());
+}
+const MAX_FILM_COUNT = 5;
 
-addElement(filmListElement, getFilmCards(5));
-addElement(filmsList, getMoreBtn());
+for (let i = 0; i < Math.min(films.length, MAX_FILM_COUNT); i++) {
+  addElement(filmListElement, getFilmCard(films[i]));
+}
+addElement(headerElement, getProfile(films));
+if (films.length > MAX_FILM_COUNT) {
+  addElement(filmsList, getMoreButton());
+}
+const moreBtn = document.querySelector('.films-list__show-more');
+let beginPoint = MAX_FILM_COUNT;
+moreBtn.addEventListener('click', (evt) => {
+  evt.preventDefault();
+  films.slice(beginPoint, beginPoint + MAX_FILM_COUNT).forEach((film) => addElement(filmListElement, getFilmCard(film)));
+  beginPoint += MAX_FILM_COUNT;
+  if (beginPoint >= films.length) {
+    moreBtn.remove();
+  }
+});
+
+addElement(mainElement, getSiteMenu(films), 'afterbegin');
+addElement(mainElement, getFilmPopup(films[0]));
 addElement(filmsList, getFilmsListExtra('Most commented'), 'afterend');
 addElement(filmsList, getFilmsListExtra('Top rated'), 'afterend');
 
-const extraFilmLists = mainElement.querySelectorAll('.films-list--extra');
-
-[...extraFilmLists].forEach((element) => {
-  const filmListContainer = element.querySelector('.films-list__container');
-  addElement(filmListContainer, getFilmCards(2));
-});
-
-const footerStatWrapper = document.querySelector('.footer__statistics');
-
-addElement(footerStatWrapper, getFilmsAmount());
+const footerStatistics = document.querySelector('.footer__statistics');
+addElement(footerStatistics, getFilmsAmount(films));

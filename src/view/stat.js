@@ -1,4 +1,4 @@
-const getStat = () =>
+const getStatistic = () =>
   `<section class="statistic">
   <p class="statistic__rank">
     Your rank
@@ -37,4 +37,4 @@ const getStat = () =>
   </div>
   </section>`;
 
-export { getStat };
+export { getStatistic };

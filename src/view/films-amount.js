@@ -1,3 +1,3 @@
-const getFilmsAmount = () => '<p>130 291 movies inside</p>';
+const getFilmsAmount = (films) => `<p>${films.length} movies inside</p>`;
 
 export { getFilmsAmount };
