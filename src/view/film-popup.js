@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { createElement } from '../utils.js';
+import AbstractElement from './abstract-element.js';
 
 const getDetailsGenres = (genres) => genres.map((element) => `<span class="film-details__genre">${element}</span>`).join('');
 
@@ -68,11 +68,17 @@ const getDetailsControl = (film) => {
   const { userDetails } = film;
   return `<section class="film-details__controls">
         <button type="button" class="film-details__control-button
-        ${userDetails.isInWatchlist ? 'film-details__control-button--active' : ''} film-details__control-button--watchlist" id="watchlist" name="watchlist">Add to watchlist</button>
+        ${
+          userDetails.isInWatchlist ? 'film-details__control-button--active' : ''
+        } film-details__control-button--watchlist" id="watchlist" name="watchlist">Add to watchlist</button>
         <button type="button" class="film-details__control-button
-        ${userDetails.isWatched ? 'film-details__control-button--active' : ''} film-details__control-button--watched" id="watched" name="watched">Already watched</button>
+        ${
+          userDetails.isWatched ? 'film-details__control-button--active' : ''
+        } film-details__control-button--watched" id="watched" name="watched">Already watched</button>
         <button type="button" class="film-details__control-button
-        ${userDetails.isFavorite ? 'film-details__control-button--active' : ''} film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
+        ${
+          userDetails.isFavorite ? 'film-details__control-button--active' : ''
+        } film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
       </section>`;
 };
 
@@ -164,24 +170,13 @@ const getFilmPopup = (film) => `<section class="film-details">
   </form>
 </section>`;
 
-export default class FilmPopup {
+export default class FilmPopup extends AbstractElement {
   constructor(film) {
+    super();
     this._film = film;
-    this._element = null;
   }
 
   getTemplate() {
     return getFilmPopup(this._film);
-  }
-
-  getElement() {
-    if (!this._element) {
-      return createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { createElement } from '../utils.js';
+import AbstractElement from './abstract-element.js';
 
 const getFilmCard = (film) => {
   const { title, rating, realiseDate, runtime, genres, poster, description, commentsList, userDetails } = film;
@@ -26,24 +26,13 @@ const getFilmCard = (film) => {
 </article>`;
 };
 
-export default class FilmCard {
+export default class FilmCard extends AbstractElement {
   constructor(film) {
+    super();
     this._film = film;
-    this._element = null;
   }
 
   getTemplate() {
     return getFilmCard(this._film);
-  }
-
-  getElement() {
-    if (!this._element) {
-      return createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
