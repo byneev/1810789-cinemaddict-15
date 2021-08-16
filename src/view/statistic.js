@@ -1,5 +1,4 @@
 import { getCountByFilters } from '../mock/filters-mock';
-import { createElement } from '../utils.js';
 import AbstractElement from './abstract-element';
 
 const getStatistic = (films) => {

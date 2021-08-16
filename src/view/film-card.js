@@ -1,5 +1,4 @@
 import dayjs from 'dayjs';
-import { createElement } from '../utils.js';
 import AbstractElement from './abstract-element.js';
 
 const getFilmCard = (film) => {

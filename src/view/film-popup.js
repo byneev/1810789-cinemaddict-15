@@ -1,5 +1,4 @@
 import dayjs from 'dayjs';
-import { createElement } from '../utils.js';
 import AbstractElement from './abstract-element.js';
 
 const getDetailsGenres = (genres) => genres.map((element) => `<span class="film-details__genre">${element}</span>`).join('');

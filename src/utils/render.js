@@ -3,32 +3,39 @@ const RenderPosition = {
   AFTERBEGIN: 'afterbegin',
 };
 
-const render = (container, component, place) => {
+const render = (container, component, place, element = null) => {
+  let elem = component.getElement();
+  if (element) {
+    elem = element;
+  }
   switch (place) {
     case RenderPosition.AFTERBEGIN:
-      container.prepend(component.getElement());
+      container.prepend(elem);
       break;
     case RenderPosition.BEFOREEND:
-      container.append(component.getElement());
+      container.append(elem);
       break;
   }
 };
 
-const onCardClickHandler = (data, target, className, callback) => {
-  target.querySelector(className).addEventListener('click', (evt) => {
+const onCardClickHandler = (target, component, className, callback) => {
+  console.log(target);
+  const evtTarget = target.querySelector(className);
+  console.log(evtTarget);
+  evtTarget.addEventListener('click', (evt) => {
+    console.log('I am her');
     evt.preventDefault();
-    callback(data, evt.target);
+    callback(component);
   });
 };
 
-const renderPopup = (film, element, component) => {
-  const filmPopupElement = new component(film).getElement();
-
+const renderPopup = (component) => {
+  const filmPopupElement = component.getElement();
   const closePopup = () => {
     document.body.removeChild(filmPopupElement);
     document.body.classList.remove('hide-overflow');
   };
-  onCardClickHandler(film, filmPopupElement, '.film-details__close-btn', closePopup);
+  onCardClickHandler(filmPopupElement, component, '.film-details__close-btn', closePopup);
 
   const onEscapeHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
@@ -40,16 +47,15 @@ const renderPopup = (film, element, component) => {
   document.body.addEventListener('keydown', (evt) => onEscapeHandler(evt));
   document.body.classList.add('hide-overflow');
   document.body.appendChild(filmPopupElement);
-  element.removeEventListener('click', renderPopup);
 };
 
 const renderFilm = (filmList, component) => {
-  const filmCardElement = component.getElement();
-
-  onCardClickHandler(film, filmCardElement, '.film-card__title', renderPopup);
-  onCardClickHandler(film, filmCardElement, '.film-card__poster', renderPopup);
-  onCardClickHandler(film, filmCardElement, '.film-card__comments', renderPopup);
-  render(filmList, filmCardElement, RenderPosition.BEFOREEND);
+  //todo
+  const element = component.getElement();
+  render(filmList, component, RenderPosition.BEFOREEND, element);
+  onCardClickHandler(element, component, '.film-card__title', renderPopup);
+  onCardClickHandler(element, component, '.film-card__poster', renderPopup);
+  onCardClickHandler(element, component, '.film-card__comments', renderPopup);
 };
 
 export { render, RenderPosition, renderPopup, renderFilm };

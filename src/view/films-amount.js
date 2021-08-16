@@ -1,4 +1,3 @@
-import { createElement } from '../utils.js';
 import AbstractElement from './abstract-element.js';
 
 const getFilmsAmount = (films) => `<p>${films.length} movies inside</p>`;

@@ -21,4 +21,4 @@ const createElement = (template) => {
   return temp.firstChild;
 };
 
-export { getRandomInteger, getRandomFloat, generateValuesFromArray, createElement, onCardClickHandler };
+export { getRandomInteger, getRandomFloat, generateValuesFromArray, createElement };

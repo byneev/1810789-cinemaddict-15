@@ -1,5 +1,6 @@
-import { createElement } from '../utils.js';
+import { createElement } from '../utils/common.js';
 
+createElement;
 export default class AbstractElement {
   constructor() {
     if (new.target === AbstractElement) {

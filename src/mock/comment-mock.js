@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { AUTHORS, MESSAGES, EMOTIONS } from '../constants';
-import { getRandomInteger } from '../utils';
+import { getRandomInteger } from '../utils/common.js';
 
 let id = 0;
 const generateComment = () => ({
