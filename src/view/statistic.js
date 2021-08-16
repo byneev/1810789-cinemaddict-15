@@ -1,4 +1,8 @@
-const getStatistic = () =>
+import { getCountByFilters } from '../mock/filters-mock';
+import { createElement } from '../utils.js';
+
+const getStatistic = (films) => {
+const countByFilters = getCountByFilters(films);
   `<section class="statistic">
   <p class="statistic__rank">
     Your rank
@@ -21,7 +25,7 @@ const getStatistic = () =>
   <ul class="statistic__text-list">
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">You watched</h4>
-      <p class="statistic__item-text">22 <span class="statistic__item-description">movies</span></p>
+      <p class="statistic__item-text">${countByFilters.isWatchedCount}<span class="statistic__item-description">movies</span></p>
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Total duration</h4>
@@ -36,5 +40,25 @@ const getStatistic = () =>
     <canvas class="statistic__chart" width="1000"></canvas>
   </div>
   </section>`;
+}
 
-export { getStatistic };
+export default class Statistic {
+  constructor(films) {
+    this._films = films;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return getStatistic(this._films);
+  }
+
+  getElement() {
+    if (!this._element) {
+      return createElement(this.getTemplate());
+    }
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
