@@ -2,7 +2,7 @@ import { getCountByFilters } from '../mock/filters-mock';
 import { createElement } from '../utils.js';
 
 const getStatistic = (films) => {
-const countByFilters = getCountByFilters(films);
+  const countByFilters = getCountByFilters(films);
   `<section class="statistic">
   <p class="statistic__rank">
     Your rank
@@ -40,7 +40,7 @@ const countByFilters = getCountByFilters(films);
     <canvas class="statistic__chart" width="1000"></canvas>
   </div>
   </section>`;
-}
+};
 
 export default class Statistic {
   constructor(films) {

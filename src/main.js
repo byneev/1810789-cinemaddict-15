@@ -7,7 +7,7 @@ import MoreButtonView from './view/more-button.js';
 import { generateFilm } from './mock/film-mock.js';
 import FilmPopupView from './view/film-popup.js';
 import FilmsAmountView from './view/films-amount.js';
-import { onCardClickHandler, render, RenderPosition } from './utils.js';
+import { render, RenderPosition } from './utils.js';
 import FilmListEmptyView from './view/films-list-empty.js';
 
 const films = [];
@@ -29,27 +29,38 @@ const renderPopup = (film, element) => {
     document.body.removeChild(filmPopupElement);
     document.body.classList.remove('hide-overflow');
   };
-  onCardClickHandler(film, filmPopupElement, '.film-details__close-btn', closePopup);
 
-  const onEscapeHandler = (evt) => {
+  filmPopupElement.querySelector('.film-details__close-btn').addEventListener('click', closePopup);
+
+  const keydownEscapeCallback = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       closePopup();
     }
-    evt.target.removeEventListener(evt.key, onEscapeHandler);
+    evt.target.removeEventListener(evt.key, keydownEscapeCallback);
   };
 
-  document.body.addEventListener('keydown', (evt) => onEscapeHandler(evt));
+  document.body.addEventListener('keydown', (evt) => keydownEscapeCallback(evt));
   document.body.classList.add('hide-overflow');
   document.body.appendChild(filmPopupElement);
   element.removeEventListener('click', renderPopup);
 };
 
+const addDataClosure = (film, filmElement) => () => {
+  renderPopup(film, filmElement);
+};
+
 const renderFilm = (filmList, film) => {
   const filmCardElement = new FilmCardView(film).getElement();
 
-  onCardClickHandler(film, filmCardElement, '.film-card__title', renderPopup);
-  onCardClickHandler(film, filmCardElement, '.film-card__poster', renderPopup);
-  onCardClickHandler(film, filmCardElement, '.film-card__comments', renderPopup);
+  const cb = addDataClosure(film, filmCardElement);
+  const clickCallback = (evt) => {
+    evt.preventDefault();
+    cb();
+  };
+
+  filmCardElement.querySelector('.film-card__title').addEventListener('click', clickCallback);
+  filmCardElement.querySelector('.film-card__poster').addEventListener('click', clickCallback);
+  filmCardElement.querySelector('.film-card__comments').addEventListener('click', clickCallback);
   render(filmList, filmCardElement, RenderPosition.BEFOREEND);
 };
 

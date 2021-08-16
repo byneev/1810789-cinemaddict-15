@@ -37,11 +37,4 @@ const render = (container, element, place) => {
   }
 };
 
-const onCardClickHandler = (data, target, className, callback) => {
-  target.querySelector(className).addEventListener('click', (evt) => {
-    evt.preventDefault();
-    callback(data, evt.target);
-  });
-};
-
-export { getRandomInteger, getRandomFloat, generateValuesFromArray, createElement, render, RenderPosition, onCardClickHandler };
+export { getRandomInteger, getRandomFloat, generateValuesFromArray, createElement, render, RenderPosition };
