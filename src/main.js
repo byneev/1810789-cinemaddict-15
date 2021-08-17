@@ -46,9 +46,8 @@ const renderFilmsBoard = () => {
     render(filmListContainer, moreButton, RenderPosition.AFTER);
   }
   let beginPoint = MAX_FILM_COUNT;
-  moreButton.getElement().addEventListener('click', (evt) => {
-    evt.preventDefault();
-    films.slice(beginPoint, beginPoint + MAX_FILM_COUNT).forEach((film) => renderFilm(filmsListComponent, film));
+  moreButton.setClickHandler(() => {
+    films.slice(beginPoint, beginPoint + MAX_FILM_COUNT).forEach((film) => renderFilm(filmListContainer, film));
     beginPoint += MAX_FILM_COUNT;
     if (beginPoint >= films.length) {
       moreButton.getElement().remove();

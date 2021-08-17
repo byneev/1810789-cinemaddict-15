@@ -6,6 +6,7 @@ export default class AbstractElement {
       throw new Error('AbstractElement is abstract class and cant be instantinate');
     }
     this._element = null;
+    this._callback = {};
   }
 
   getTemplate() {

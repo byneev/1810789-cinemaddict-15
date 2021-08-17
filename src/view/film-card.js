@@ -30,9 +30,9 @@ export default class FilmCard extends AbstractElement {
   constructor(film) {
     super();
     this._film = film;
-    this._callback = {
-      click: null,
-    };
+    // this._callback = {
+    //   click: null,
+    // };
     this._clickHandler = this._clickHandler.bind(this);
   }
 
