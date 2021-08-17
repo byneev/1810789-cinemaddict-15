@@ -6,8 +6,18 @@ import MoreButtonView from './view/more-button.js';
 import { generateFilm } from './mock/film-mock.js';
 import FilmsAmountView from './view/films-amount.js';
 import FilmListEmptyView from './view/films-list-empty.js';
-import { render, RenderPosition, renderFilm } from './utils/render.js';
+import { render, RenderPosition, renderPopup } from './utils/render.js';
 import FilmCardView from './view/film-card.js';
+import FilmPopupView from './view/film-popup.js';
+
+const renderFilm = (filmList, film) => {
+  const filmCard = new FilmCardView(film);
+  const filmPopup = new FilmPopupView(film);
+  render(filmList, filmCard, RenderPosition.BEFOREEND);
+  filmCard.setClickHandler(() => {
+    renderPopup(filmPopup);
+  });
+};
 
 const films = [];
 for (let i = 0; i < 20; i++) {
@@ -26,26 +36,22 @@ const renderFilmsBoard = () => {
   render(mainElement, new SortView(), RenderPosition.BEFOREEND);
   const filmsListComponent = new FilmsListView();
   render(mainElement, filmsListComponent, RenderPosition.BEFOREEND);
-
-  const filmsList = mainElement.querySelector('.films-list');
-  const filmListElement = filmsList.querySelector('.films-list__container');
-
+  const filmListContainer = mainElement.querySelector('.films-list__container');
   const MAX_FILM_COUNT = 5;
   for (let i = 0; i < Math.min(films.length, MAX_FILM_COUNT); i++) {
-    renderFilm(filmListElement, new FilmCardView(films[i]));
+    renderFilm(filmListContainer, films[i]);
   }
-  // todo
+  const moreButton = new MoreButtonView();
   if (films.length > MAX_FILM_COUNT) {
-    render(filmsList, new MoreButtonView(), RenderPosition.BEFOREEND);
+    render(filmListContainer, moreButton, RenderPosition.AFTER);
   }
-  const moreButton = filmsList.querySelector('.films-list__show-more');
   let beginPoint = MAX_FILM_COUNT;
-  moreButton.addEventListener('click', (evt) => {
+  moreButton.getElement().addEventListener('click', (evt) => {
     evt.preventDefault();
-    films.slice(beginPoint, beginPoint + MAX_FILM_COUNT).forEach((film) => renderFilm(filmListElement, new FilmCardView(film)));
+    films.slice(beginPoint, beginPoint + MAX_FILM_COUNT).forEach((film) => renderFilm(filmsListComponent, film));
     beginPoint += MAX_FILM_COUNT;
     if (beginPoint >= films.length) {
-      moreButton.remove();
+      moreButton.getElement().remove();
     }
   });
 };

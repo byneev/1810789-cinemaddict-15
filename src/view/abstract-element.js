@@ -1,6 +1,5 @@
 import { createElement } from '../utils/common.js';
 
-createElement;
 export default class AbstractElement {
   constructor() {
     if (new.target === AbstractElement) {
@@ -15,7 +14,7 @@ export default class AbstractElement {
 
   getElement() {
     if (!this._element) {
-      return createElement(this.getTemplate());
+      this._element = createElement(this.getTemplate());
     }
     return this._element;
   }
