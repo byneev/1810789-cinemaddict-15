@@ -1,8 +1,8 @@
 import { getCountByFilters } from '../mock/filters-mock';
-import { createElement } from '../utils.js';
+import AbstractElement from './abstract-element';
 
 const getStatistic = (films) => {
-const countByFilters = getCountByFilters(films);
+  const countByFilters = getCountByFilters(films);
   `<section class="statistic">
   <p class="statistic__rank">
     Your rank
@@ -40,25 +40,15 @@ const countByFilters = getCountByFilters(films);
     <canvas class="statistic__chart" width="1000"></canvas>
   </div>
   </section>`;
-}
+};
 
-export default class Statistic {
+export default class Statistic extends AbstractElement {
   constructor(films) {
+    super();
     this._films = films;
-    this._element = null;
   }
 
   getTemplate() {
     return getStatistic(this._films);
-  }
-
-  getElement() {
-    if (!this._element) {
-      return createElement(this.getTemplate());
-    }
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

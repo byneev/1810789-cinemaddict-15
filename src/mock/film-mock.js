@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { ACTORS, COUNTRIES, ORIGINAL_TITLES, PARAGRAPHS, POSTERS, PRODUCERS, WRITERS, GENRES } from '../constants.js';
-import { generateValuesFromArray, getRandomFloat, getRandomInteger } from '../utils.js';
+import { generateValuesFromArray, getRandomFloat, getRandomInteger } from '../utils/common.js';
 import { generateComment } from './comment-mock.js';
 
 const generateDescription = () => {

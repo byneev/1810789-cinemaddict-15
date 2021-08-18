@@ -1,5 +1,5 @@
 import { getCountByFilters } from '../mock/filters-mock.js';
-import { createElement } from '../utils.js';
+import AbstractElement from './abstract-element.js';
 
 const getProfile = (films) => {
   const countByFilters = getCountByFilters(films);
@@ -21,24 +21,13 @@ const getProfile = (films) => {
 </section>`;
 };
 
-export default class Profile {
+export default class Profile extends AbstractElement {
   constructor(films) {
+    super();
     this._films = films;
-    this._element = null;
   }
 
   getTemplate() {
     return getProfile(this._films);
-  }
-
-  getElement() {
-    if (!this._element) {
-      return createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

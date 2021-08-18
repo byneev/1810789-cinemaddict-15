@@ -1,4 +1,4 @@
-import { createElement } from '../utils.js';
+import AbstractElement from './abstract-element.js';
 
 const getFilmsList = (activeMenuItem) => {
   let message;
@@ -22,24 +22,13 @@ const getFilmsList = (activeMenuItem) => {
     </section></section>`;
 };
 
-export default class FilmListEmpty {
+export default class FilmListEmpty extends AbstractElement {
   constructor(activeMenuItem) {
-    this._element = null;
+    super();
     this._activeMenuItem = activeMenuItem;
   }
 
   getTemplate() {
     return getFilmsList(this._activeMenuItem);
-  }
-
-  getElement() {
-    if (!this._element) {
-      return createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
