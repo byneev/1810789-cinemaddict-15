@@ -22,7 +22,6 @@ export default class Film {
     this._film = filmData;
     const oldFilmCard = this._filmCardComponent;
     this._filmCardComponent = new FilmCardView(filmData);
-    // this._filmPopupComponent = new FilmPopupView(filmData);
     this._filmCardComponent.setClickHandler(this._clickHandler);
     this._filmCardComponent.setClickFavoriteHandler(this._clickFavoriteHandler);
     this._filmCardComponent.setClickWatchlistHandler(this._clickWatchlistHandler);
@@ -61,7 +60,6 @@ export default class Film {
   }
 
   _clickHandler() {
-    //TODO
     this._closeAllPopups();
     this._renderPopup(this._film);
   }
@@ -74,7 +72,7 @@ export default class Film {
           isFavorite: !this._film.userDetails.isFavorite,
           isInWatchlist: this._film.userDetails.isInWatchlist,
         },
-      })
+      }),
     );
   }
 
@@ -86,7 +84,7 @@ export default class Film {
           isFavorite: this._film.userDetails.isFavorite,
           isInWatchlist: !this._film.userDetails.isInWatchlist,
         },
-      })
+      }),
     );
   }
 
@@ -98,7 +96,7 @@ export default class Film {
           isFavorite: this._film.userDetails.isFavorite,
           isInWatchlist: this._film.userDetails.isInWatchlist,
         },
-      })
+      }),
     );
   }
 }
