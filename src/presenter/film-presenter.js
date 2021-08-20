@@ -15,20 +15,19 @@ export default class Film {
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
     this._clickWatchlistHandler = this._clickWatchlistHandler.bind(this);
     this._clickWatchedHandler = this._clickWatchedHandler.bind(this);
+    this._closePopup = this._closePopup.bind(this);
   }
 
   init(filmData) {
     this._film = filmData;
     const oldFilmCard = this._filmCardComponent;
     this._filmCardComponent = new FilmCardView(filmData);
-    this._filmPopupComponent = new FilmPopupView(filmData);
+    // this._filmPopupComponent = new FilmPopupView(filmData);
     this._filmCardComponent.setClickHandler(this._clickHandler);
     this._filmCardComponent.setClickFavoriteHandler(this._clickFavoriteHandler);
     this._filmCardComponent.setClickWatchlistHandler(this._clickWatchlistHandler);
     this._filmCardComponent.setClickWatchedHandler(this._clickWatchedHandler);
-    this._filmPopupComponent.setClickFavoriteHandler(this._clickFavoriteHandler);
-    this._filmPopupComponent.setClickWatchlistHandler(this._clickWatchlistHandler);
-    this._filmPopupComponent.setClickWatchedHandler(this._clickWatchedHandler);
+
     if (oldFilmCard === null) {
       render(this._container, this._filmCardComponent, RenderPosition.BEFOREEND);
       return;
@@ -37,7 +36,11 @@ export default class Film {
     remove(oldFilmCard);
   }
 
-  _renderPopup(component) {
+  _renderPopup(filmData) {
+    this._filmPopupComponent = new FilmPopupView(filmData);
+    this._filmPopupComponent.setClickFavoriteHandler(this._clickFavoriteHandler);
+    this._filmPopupComponent.setClickWatchlistHandler(this._clickWatchlistHandler);
+    this._filmPopupComponent.setClickWatchedHandler(this._clickWatchedHandler);
     const onEscapeKeydown = (evt) => {
       if (evt.key === 'Escape' || evt.key === 'Esc') {
         this._closePopup();
@@ -47,22 +50,20 @@ export default class Film {
     this._filmPopupComponent.setClickCloseButtonHandler(this._closePopup);
     document.body.addEventListener('keydown', onEscapeKeydown);
     document.body.classList.add('hide-overflow');
-    document.body.appendChild(component.getElement());
+    document.body.appendChild(this._filmPopupComponent.getElement());
     this._isOpen = true;
+    this._currentPopup = this._filmPopupComponent.getElement();
   }
 
   _closePopup() {
     remove(this._filmPopupComponent);
     document.body.classList.remove('hide-overflow');
-    this._isOpen = false;
   }
 
   _clickHandler() {
     //TODO
-    //POPUP не закрывается -_-
-
     this._closeAllPopups();
-    this._renderPopup(this._filmPopupComponent);
+    this._renderPopup(this._film);
   }
 
   _clickFavoriteHandler() {

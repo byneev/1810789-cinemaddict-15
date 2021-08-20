@@ -18,6 +18,7 @@ export default class FilmList {
     this._handleFilmChange = this._handleFilmChange.bind(this);
     this._closeAllPopups = this._closeAllPopups.bind(this);
     this._clickMoreButtonHandler = this._clickMoreButtonHandler.bind(this);
+    this._renderFilms = this._renderFilms.bind(this);
   }
 
   init(films) {
@@ -29,23 +30,26 @@ export default class FilmList {
 
   _handleFilmChange(updatedFilm) {
     this._films = updateArray(this._films, updateArray);
-    console.log(this._filmPresenters);
-    this._filmPresenters.get(updatedFilm.id).init(updatedFilm);
+    const currentFilmPresenter = this._filmPresenters.get(updatedFilm.id);
+    currentFilmPresenter.init(updatedFilm);
+    if (currentFilmPresenter._isOpen) {
+      currentFilmPresenter._closePopup();
+      currentFilmPresenter._renderPopup(currentFilmPresenter._film);
+    }
   }
 
   _closeAllPopups() {
     this._filmPresenters.forEach((value) => {
-      if (value.isOpen) {
-        value.closePopup();
-        console.log(value);
+      if (value._isOpen) {
+        value._closePopup();
       }
     });
   }
 
   _renderFilm(film) {
-    const filmPresenter = new FilmPresenter(this._filmsListContainer, this._handleFilmChange, this._closeAllPopups);
-    filmPresenter.init(film);
-    this._filmPresenters.set(film.id, filmPresenter);
+    this._filmPresenter = new FilmPresenter(this._filmsListContainer, this._handleFilmChange, this._closeAllPopups);
+    this._filmPresenter.init(film);
+    this._filmPresenters.set(film.id, this._filmPresenter);
   }
 
   _renderFilms(from, to) {
@@ -69,7 +73,8 @@ export default class FilmList {
   }
 
   _clickMoreButtonHandler() {
-    this._renderFilms(this._beginPoint, this._beginPoint + this.MAX_FILMS_COUNT).this._beginPoint += this.MAX_FILMS_COUNT;
+    this._renderFilms(this._beginPoint, this._beginPoint + this.MAX_FILMS_COUNT);
+    this._beginPoint += this.MAX_FILMS_COUNT;
     if (this._beginPoint > this._films.length) {
       remove(this._moreButtonComponent);
     }

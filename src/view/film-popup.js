@@ -211,12 +211,12 @@ export default class FilmPopup extends AbstractElement {
   }
 
   setClickWatchlistHandler(callback) {
-    this._callback.clickFavorite = callback;
+    this._callback.clickWatchlist = callback;
     this.getElement().querySelector('.film-details__control-button--watchlist').addEventListener('click', this._clickWatchlistHandler);
   }
 
   setClickWatchedHandler(callback) {
-    this._callback.clickFavorite = callback;
+    this._callback.clickWatched = callback;
     this.getElement().querySelector('.film-details__control-button--watched').addEventListener('click', this._clickWatchedHandler);
   }
 
