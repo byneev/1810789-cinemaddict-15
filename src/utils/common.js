@@ -14,7 +14,7 @@ const createElement = (template) => {
 };
 
 const remove = (component) => {
-  component.getElement.remove();
+  component.getElement().remove();
   component.removeElement();
 };
 
@@ -29,4 +29,6 @@ const replace = (newChild, oldChild) => {
   parent.replaceChild(newChild, oldChild);
 };
 
-export { getRandomInteger, getRandomFloat, generateValuesFromArray, createElement, remove, replace };
+const updateArray = (array, updatedItem) => array.map((item) => (item.id === updatedItem.id ? updatedItem : item));
+
+export { getRandomInteger, getRandomFloat, generateValuesFromArray, createElement, remove, replace, updateArray };

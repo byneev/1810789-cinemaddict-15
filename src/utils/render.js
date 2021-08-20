@@ -31,23 +31,4 @@ const render = (container, child, place) => {
   }
 };
 
-const renderPopup = (component) => {
-  const closePopup = () => {
-    document.body.removeChild(component.getElement());
-    document.body.classList.remove('hide-overflow');
-    component.getElement().querySelector('.film-details__close-btn').removeEventListener('click', closePopup);
-  };
-  const onEscapeKeydown = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      closePopup();
-    }
-    document.body.removeEventListener('keydown', onEscapeKeydown);
-  };
-
-  component.getElement().querySelector('.film-details__close-btn').addEventListener('click', closePopup);
-  document.body.addEventListener('keydown', onEscapeKeydown);
-  document.body.classList.add('hide-overflow');
-  document.body.appendChild(component.getElement());
-};
-
-export { render, RenderPosition, renderPopup };
+export { render, RenderPosition };
