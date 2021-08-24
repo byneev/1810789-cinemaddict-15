@@ -6,7 +6,6 @@ import FilmPopupView from '../view/film-popup.js';
 export default class Film {
   constructor(container, changeData, closeAllPopups) {
     this._closeAllPopups = closeAllPopups;
-    this._isOpen = false;
     this._container = container;
     this.changeData = changeData;
     this._filmCardComponent = null;
@@ -37,9 +36,7 @@ export default class Film {
 
   _renderPopup(filmData) {
     this._filmPopupComponent = new FilmPopupView(filmData);
-    this._filmPopupComponent.setClickFavoriteHandler(this._clickFavoriteHandler);
-    this._filmPopupComponent.setClickWatchlistHandler(this._clickWatchlistHandler);
-    this._filmPopupComponent.setClickWatchedHandler(this._clickWatchedHandler);
+
     const onEscapeKeydown = (evt) => {
       if (evt.key === 'Escape' || evt.key === 'Esc') {
         this._closePopup();
@@ -50,13 +47,13 @@ export default class Film {
     document.body.addEventListener('keydown', onEscapeKeydown);
     document.body.classList.add('hide-overflow');
     document.body.appendChild(this._filmPopupComponent.getElement());
-    this._isOpen = true;
-    this._currentPopup = this._filmPopupComponent.getElement();
   }
 
   _closePopup() {
+    const updatedFilm = this._filmPopupComponent.getUpdatedFilm();
     remove(this._filmPopupComponent);
     document.body.classList.remove('hide-overflow');
+    this.changeData(updatedFilm);
   }
 
   _clickHandler() {
@@ -72,7 +69,7 @@ export default class Film {
           isFavorite: !this._film.userDetails.isFavorite,
           isInWatchlist: this._film.userDetails.isInWatchlist,
         },
-      }),
+      })
     );
   }
 
@@ -84,7 +81,7 @@ export default class Film {
           isFavorite: this._film.userDetails.isFavorite,
           isInWatchlist: !this._film.userDetails.isInWatchlist,
         },
-      }),
+      })
     );
   }
 
@@ -96,7 +93,7 @@ export default class Film {
           isFavorite: this._film.userDetails.isFavorite,
           isInWatchlist: this._film.userDetails.isInWatchlist,
         },
-      }),
+      })
     );
   }
 }

@@ -13,8 +13,11 @@ export default class Smart extends AbstractElement {
   updateElement() {
     const prevElement = this.getElement();
     const parent = prevElement.parentNode;
+    const currentScroll = prevElement.scrollTop;
     this.removeElement();
-    parent.replaceChild(this.getElement(), prevElement);
+    const newChild = this.getElement();
+    parent.replaceChild(newChild, prevElement);
+    newChild.scrollTop = currentScroll;
     this.restoreHandlers();
   }
 

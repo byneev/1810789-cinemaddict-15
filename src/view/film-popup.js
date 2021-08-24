@@ -1,6 +1,8 @@
 import dayjs from 'dayjs';
 import Smart from './smart.js';
 
+const EMOJIES = ['smile', 'sleeping', 'puke', 'angry'];
+
 const formatDateByOld = (date) => {
   let result = dayjs(date).format('YYYY/MM/DD hh:mm');
   const nowDate = dayjs().toDate();
@@ -29,7 +31,7 @@ const getComment = (comment) => {
 };
 
 const getFilmPopup = (film) => {
-  const { description, poster, title, ageRating, originalTitle, rating, producer, writers, actors, realiseDate, runtime, country, genres, commentsList, userDetails } = film;
+  const { description, poster, title, ageRating, originalTitle, rating, producer, writers, actors, realiseDate, runtime, country, genres, commentsList, isInWatchlist, isWatched, isFavorite, emoji } = film;
   return `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
     <div class="film-details__top-container">
@@ -90,11 +92,11 @@ const getFilmPopup = (film) => {
       </div>
       <section class="film-details__controls">
         <button type="button" class="film-details__control-button
-        ${userDetails.isInWatchlist ? 'film-details__control-button--active' : ''} film-details__control-button--watchlist" id="watchlist" name="watchlist">Add to watchlist</button>
+        ${isInWatchlist ? 'film-details__control-button--active' : ''} film-details__control-button--watchlist" id="watchlist" name="watchlist">Add to watchlist</button>
         <button type="button" class="film-details__control-button
-        ${userDetails.isWatched ? 'film-details__control-button--active' : ''} film-details__control-button--watched" id="watched" name="watched">Already watched</button>
+        ${isWatched ? 'film-details__control-button--active' : ''} film-details__control-button--watched" id="watched" name="watched">Already watched</button>
         <button type="button" class="film-details__control-button
-        ${userDetails.isFavorite ? 'film-details__control-button--active' : ''} film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
+        ${isFavorite ? 'film-details__control-button--active' : ''} film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
       </section>
     </div>
     <div class="film-details__bottom-container">
@@ -106,27 +108,19 @@ const getFilmPopup = (film) => {
     ${commentsList.map((comment) => getComment(comment)).join('')}
   </ul>
         <div class="film-details__new-comment">
-          <div class="film-details__add-emoji-label"></div>
+          <div class="film-details__add-emoji-label">
+          ${!emoji ? '' : `<img src="images/emoji/${emoji}.png" width="55" height="55" alt="emoji-smile"></img>`}
+          </div>
           <label class="film-details__comment-label">
             <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
           </label>
           <div class="film-details__emoji-list">
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
-            <label class="film-details__emoji-label" for="emoji-smile">
-              <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
-            </label>
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
-            <label class="film-details__emoji-label" for="emoji-sleeping">
-              <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
-            </label>
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
-            <label class="film-details__emoji-label" for="emoji-puke">
-              <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
-            </label>
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
-            <label class="film-details__emoji-label" for="emoji-angry">
-              <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
-            </label>
+          ${EMOJIES.map(
+            (item) => `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${item}" value="${item}" ${item === emoji ? 'checked' : ''}>
+            <label class="film-details__emoji-label" for="emoji-${item}">
+              <img src="./images/emoji/${item}.png" width="30" height="30" alt="emoji">
+            </label>`
+          ).join('')}
           </div>
         </div>
       </section>
@@ -141,29 +135,76 @@ export default class FilmPopup extends Smart {
     this._data = FilmPopup._parseFilmToData(film);
     this._clickCloseButtonHandler = this._clickCloseButtonHandler.bind(this);
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
-    this._clickWatchlistHandler = this._clickWatchlistHandler.bind(this);
+    this._clickInWatchlistHandler = this._clickInWatchlistHandler.bind(this);
     this._clickWatchedHandler = this._clickWatchedHandler.bind(this);
+    this._clickEmojiHandler = this._clickEmojiHandler.bind(this);
     this._setInnerHandlers();
   }
 
-  _setInnerHandlers() {
-    // устанваливаем внутренние хэндлеры, в которых будет вызываться updateData с измененными служебными данными
-    // устанавливаем хэндлеры из презентера
+  _clickEmojiHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      emoji: evt.target.parentNode.getAttribute('for').split('-')[1],
+    });
   }
 
-  restoreHandlers() {}
+  _clickWatchedHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      isWatched: !this._data.isWatched,
+    });
+  }
+
+  _clickInWatchlistHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      isInWatchlist: !this._data.isInWatchlist,
+    });
+  }
+
+  _clickFavoriteHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      isFavorite: !this._data.isFavorite,
+    });
+  }
+
+  _setInnerHandlers() {
+    const labels = this.getElement().querySelectorAll('.film-details__emoji-label');
+    [...labels].forEach((label) => label.addEventListener('click', this._clickEmojiHandler));
+    this.getElement().querySelector('.film-details__control-button--favorite').addEventListener('click', this._clickFavoriteHandler);
+    this.getElement().querySelector('.film-details__control-button--watchlist').addEventListener('click', this._clickInWatchlistHandler);
+    this.getElement().querySelector('.film-details__control-button--watched').addEventListener('click', this._clickWatchedHandler);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setClickCloseButtonHandler(this._callback.clickClose);
+  }
 
   static _parseFilmToData(film) {
     return Object.assign({}, film, {
-      /* создаем служебные данные на основе film */
+      isFavorite: film.userDetails.isFavorite,
+      isInWatchlist: film.userDetails.isInWatchlist,
+      isWatched: film.userDetails.isWatched,
+      emoji: null,
     });
   }
 
   static _parseDataToFilm(data) {
     const filmData = Object.assign({}, data);
-    // используем служебные данные this._data, чтобы изменить данные в film
-    // удаляем служебные данные this._data
+    filmData.userDetails.isFavorite = filmData.isFavorite;
+    filmData.userDetails.isInWatchlist = filmData.isInWatchlist;
+    filmData.userDetails.isWatched = filmData.isWatched;
+    delete filmData.isFavorite;
+    delete filmData.isInWatchlist;
+    delete filmData.isWatched;
+    delete filmData.emoji;
     return filmData;
+  }
+
+  getUpdatedFilm() {
+    return FilmPopup._parseDataToFilm(this._data);
   }
 
   _clickCloseButtonHandler(evt) {
@@ -171,39 +212,9 @@ export default class FilmPopup extends Smart {
     this._callback.clickClose();
   }
 
-  _clickFavoriteHandler(evt) {
-    evt.preventDefault();
-    this._callback.clickFavorite();
-  }
-
-  _clickWatchlistHandler(evt) {
-    evt.preventDefault();
-    this._callback.clickWatchlist();
-  }
-
-  _clickWatchedHandler(evt) {
-    evt.preventDefault();
-    this._callback.clickWatched();
-  }
-
   setClickCloseButtonHandler(callback) {
     this._callback.clickClose = callback;
     this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._clickCloseButtonHandler);
-  }
-
-  setClickFavoriteHandler(callback) {
-    this._callback.clickFavorite = callback;
-    this.getElement().querySelector('.film-details__control-button--favorite').addEventListener('click', this._clickFavoriteHandler);
-  }
-
-  setClickWatchlistHandler(callback) {
-    this._callback.clickWatchlist = callback;
-    this.getElement().querySelector('.film-details__control-button--watchlist').addEventListener('click', this._clickWatchlistHandler);
-  }
-
-  setClickWatchedHandler(callback) {
-    this._callback.clickWatched = callback;
-    this.getElement().querySelector('.film-details__control-button--watched').addEventListener('click', this._clickWatchedHandler);
   }
 
   getTemplate() {
