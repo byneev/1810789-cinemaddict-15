@@ -16,12 +16,10 @@ const headerElement = document.querySelector('.header');
 
 const siteMenuComponent = new SiteMenuView(films);
 render(mainElement, siteMenuComponent, RenderPosition.BEFOREEND);
-const siteMenuActiveItem = siteMenuComponent.getElement().querySelector('.main-navigation__item--active');
-const siteMenuActiveItemHref = siteMenuActiveItem.getAttribute('href');
 render(headerElement, new ProfileView(films), RenderPosition.BEFOREEND);
 render(mainElement, new SortView(), RenderPosition.BEFOREEND);
 
-const filmListPresenter = new FilmListPresenter(mainElement, siteMenuActiveItemHref);
+const filmListPresenter = new FilmListPresenter(mainElement, siteMenuComponent);
 filmListPresenter.init(films);
 
 const footerStatistics = document.querySelector('.footer__statistics');

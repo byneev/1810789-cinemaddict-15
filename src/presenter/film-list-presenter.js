@@ -5,16 +5,16 @@ import FilmsListView from '../view/films-list.js';
 import MoreButtonView from '../view/more-button.js';
 import FilmPresenter from './film-presenter.js';
 
-export default class FilmList {
-  constructor(container, activeMenuItem) {
-    this._activeMenuItem = activeMenuItem;
-    this.MAX_FILMS_COUNT = 5;
-    this._beginPoint = this.MAX_FILMS_COUNT;
+const MAX_FILMS_COUNT = 5;
+
+export default class FilmListPresenter {
+  constructor(container, siteMenuComponent) {
+    this._siteMenuComponent = siteMenuComponent;
+    this._beginPoint = MAX_FILMS_COUNT;
     this._filmPresenters = new Map();
     this._container = container;
-    this._moreButtonComponent = new MoreButtonView();
+    this._moreButtonComponent = null;
     this._filmsListComponent = new FilmsListView();
-    this._filmsListEmptyComponent = new FilmListEmptyView();
     this._handleFilmChange = this._handleFilmChange.bind(this);
     this._closeAllPopups = this._closeAllPopups.bind(this);
     this._clickMoreButtonHandler = this._clickMoreButtonHandler.bind(this);
@@ -61,21 +61,26 @@ export default class FilmList {
   }
 
   _renderFilmsList() {
+    if (this._moreButtonComponent !== null) {
+      remove(this._moreButtonComponent);
+    }
+    this._moreButtonComponent = new MoreButtonView();
     if (this._films.length === 0) {
-      render(this._filmsListContainer, this._filmsListEmptyComponent(this._films_activeMenuItem), RenderPosition.BEFOREEND);
+      const siteMenuActiveItemHref = this._siteMenuComponent.getElement().querySelector('.main-navigation__item--active').getAttribute('href');
+      render(this._filmsListContainer, new FilmListEmptyView(siteMenuActiveItemHref), RenderPosition.BEFOREEND);
       return;
     }
-    this._renderFilms(0, Math.min(this._films.length, this.MAX_FILMS_COUNT));
-    if (this._films.length > this.MAX_FILMS_COUNT) {
+    this._renderFilms(0, Math.min(this._films.length, MAX_FILMS_COUNT));
+    if (this._films.length > MAX_FILMS_COUNT) {
       this._renderLoadMoreButton();
     }
     this._moreButtonComponent.setClickHandler(this._clickMoreButtonHandler);
   }
 
   _clickMoreButtonHandler() {
-    this._renderFilms(this._beginPoint, this._beginPoint + this.MAX_FILMS_COUNT);
-    this._beginPoint += this.MAX_FILMS_COUNT;
-    if (this._beginPoint > this._films.length) {
+    this._renderFilms(this._beginPoint, this._beginPoint + MAX_FILMS_COUNT);
+    this._beginPoint += MAX_FILMS_COUNT;
+    if (this._beginPoint >= this._films.length) {
       remove(this._moreButtonComponent);
     }
   }
