@@ -63,17 +63,17 @@ export default class FilmCard extends AbstractElement {
     this.getElement().querySelector('.film-card__comments').addEventListener('click', this._clickHandler);
   }
 
-  setClickFavoriteHandler(callback) {
+  setFavoriteClickHandler(callback) {
     this._callback.clickFavorite = callback;
     this.getElement().querySelector('.film-card__controls-item--favorite').addEventListener('click', this._clickFavoriteHandler);
   }
 
-  setClickWatchlistHandler(callback) {
+  setWatchlistClickHandler(callback) {
     this._callback.clickWatchlist = callback;
     this.getElement().querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this._clickWatchlistHandler);
   }
 
-  setClickWatchedHandler(callback) {
+  setWatchedClickHandler(callback) {
     this._callback.clickWatched = callback;
     this.getElement().querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this._clickWatchedHandler);
   }

@@ -3,10 +3,9 @@ import { render, RenderPosition } from '../utils/render.js';
 import FilmCardView from '../view/film-card.js';
 import FilmPopupView from '../view/film-popup.js';
 
-export default class Film {
+export default class FilmPresenter {
   constructor(container, changeData, closeAllPopups) {
     this._closeAllPopups = closeAllPopups;
-    this._isOpen = false;
     this._container = container;
     this.changeData = changeData;
     this._filmCardComponent = null;
@@ -16,6 +15,7 @@ export default class Film {
     this._clickWatchlistHandler = this._clickWatchlistHandler.bind(this);
     this._clickWatchedHandler = this._clickWatchedHandler.bind(this);
     this._closePopup = this._closePopup.bind(this);
+    this._onEscapeKeydown = this._onEscapeKeydown.bind(this);
   }
 
   init(filmData) {
@@ -23,9 +23,10 @@ export default class Film {
     const oldFilmCard = this._filmCardComponent;
     this._filmCardComponent = new FilmCardView(filmData);
     this._filmCardComponent.setClickHandler(this._clickHandler);
-    this._filmCardComponent.setClickFavoriteHandler(this._clickFavoriteHandler);
-    this._filmCardComponent.setClickWatchlistHandler(this._clickWatchlistHandler);
-    this._filmCardComponent.setClickWatchedHandler(this._clickWatchedHandler);
+    this._filmCardComponent.setFavoriteClickHandler(this._clickFavoriteHandler);
+    this._filmCardComponent.setWatchlistClickHandler(this._clickWatchlistHandler);
+    this._filmCardComponent.setWatchedClickHandler(this._clickWatchedHandler);
+    this._filmCardComponent.setWatchedClickHandler(this._clickWatchedHandler);
 
     if (oldFilmCard === null) {
       render(this._container, this._filmCardComponent, RenderPosition.BEFOREEND);
@@ -35,28 +36,26 @@ export default class Film {
     remove(oldFilmCard);
   }
 
+  _onEscapeKeydown(evt) {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      this._closePopup();
+    }
+    document.body.removeEventListener('keydown', this._onEscapeKeydown);
+  }
+
   _renderPopup(filmData) {
     this._filmPopupComponent = new FilmPopupView(filmData);
-    this._filmPopupComponent.setClickFavoriteHandler(this._clickFavoriteHandler);
-    this._filmPopupComponent.setClickWatchlistHandler(this._clickWatchlistHandler);
-    this._filmPopupComponent.setClickWatchedHandler(this._clickWatchedHandler);
-    const onEscapeKeydown = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        this._closePopup();
-      }
-      document.body.removeEventListener('keydown', onEscapeKeydown);
-    };
-    this._filmPopupComponent.setClickCloseButtonHandler(this._closePopup);
-    document.body.addEventListener('keydown', onEscapeKeydown);
+    this._filmPopupComponent.setCloseButtonClickHandler(this._closePopup);
+    document.body.addEventListener('keydown', this._onEscapeKeydown);
     document.body.classList.add('hide-overflow');
     document.body.appendChild(this._filmPopupComponent.getElement());
-    this._isOpen = true;
-    this._currentPopup = this._filmPopupComponent.getElement();
   }
 
   _closePopup() {
+    const updatedFilm = this._filmPopupComponent.getUpdatedFilm();
     remove(this._filmPopupComponent);
     document.body.classList.remove('hide-overflow');
+    this.changeData(updatedFilm);
   }
 
   _clickHandler() {
