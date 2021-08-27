@@ -132,6 +132,7 @@ const getFilmPopup = (film) => {
 export default class FilmPopup extends Smart {
   constructor(film) {
     super();
+    this._commentText = null;
     this._data = FilmPopup._parseFilmToData(film);
     this._clickCloseButtonHandler = this._clickCloseButtonHandler.bind(this);
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
@@ -139,6 +140,11 @@ export default class FilmPopup extends Smart {
     this._clickWatchedHandler = this._clickWatchedHandler.bind(this);
     this._clickEmojiHandler = this._clickEmojiHandler.bind(this);
     this._setInnerHandlers();
+  }
+
+  updateData(data) {
+    super.updateData(data);
+    this.getElement().querySelector('.film-details__comment-input').value = this._commentText;
   }
 
   _clickEmojiHandler(evt) {
@@ -175,11 +181,16 @@ export default class FilmPopup extends Smart {
     this.getElement().querySelector('.film-details__control-button--favorite').addEventListener('click', this._clickFavoriteHandler);
     this.getElement().querySelector('.film-details__control-button--watchlist').addEventListener('click', this._clickInWatchlistHandler);
     this.getElement().querySelector('.film-details__control-button--watched').addEventListener('click', this._clickWatchedHandler);
+    this.getElement()
+      .querySelector('.film-details__comment-input')
+      .addEventListener('input', () => {
+        this._commentText = this.getElement().querySelector('.film-details__comment-input').value;
+      });
   }
 
   restoreHandlers() {
     this._setInnerHandlers();
-    this.setClickCloseButtonHandler(this._callback.clickClose);
+    this.setCloseButtonClickHandler(this._callback.clickClose);
   }
 
   static _parseFilmToData(film) {
@@ -188,6 +199,7 @@ export default class FilmPopup extends Smart {
       isInWatchlist: film.userDetails.isInWatchlist,
       isWatched: film.userDetails.isWatched,
       emoji: null,
+      description: null,
     });
   }
 
@@ -212,7 +224,7 @@ export default class FilmPopup extends Smart {
     this._callback.clickClose();
   }
 
-  setClickCloseButtonHandler(callback) {
+  setCloseButtonClickHandler(callback) {
     this._callback.clickClose = callback;
     this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._clickCloseButtonHandler);
   }
