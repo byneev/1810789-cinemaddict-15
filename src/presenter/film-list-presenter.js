@@ -29,13 +29,9 @@ export default class FilmListPresenter {
   }
 
   _handleFilmChange(updatedFilm) {
-    this._films = updateArray(this._films, updateArray);
+    this._films = updateArray(this._films, updatedFilm);
     const currentFilmPresenter = this._filmPresenters.get(updatedFilm.id);
     currentFilmPresenter.init(updatedFilm);
-    if (currentFilmPresenter._isOpen) {
-      currentFilmPresenter._closePopup();
-      currentFilmPresenter._renderPopup(currentFilmPresenter._film);
-    }
   }
 
   _closeAllPopups() {
