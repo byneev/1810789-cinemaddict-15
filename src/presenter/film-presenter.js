@@ -71,7 +71,7 @@ export default class FilmPresenter {
           isFavorite: !this._film.userDetails.isFavorite,
           isInWatchlist: this._film.userDetails.isInWatchlist,
         },
-      })
+      }),
     );
   }
 
@@ -83,7 +83,7 @@ export default class FilmPresenter {
           isFavorite: this._film.userDetails.isFavorite,
           isInWatchlist: !this._film.userDetails.isInWatchlist,
         },
-      })
+      }),
     );
   }
 
@@ -95,7 +95,7 @@ export default class FilmPresenter {
           isFavorite: this._film.userDetails.isFavorite,
           isInWatchlist: this._film.userDetails.isInWatchlist,
         },
-      })
+      }),
     );
   }
 }

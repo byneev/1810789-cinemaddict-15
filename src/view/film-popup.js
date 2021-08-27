@@ -115,12 +115,10 @@ const getFilmPopup = (film) => {
             <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
           </label>
           <div class="film-details__emoji-list">
-          ${EMOJIES.map(
-            (item) => `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${item}" value="${item}" ${item === emoji ? 'checked' : ''}>
+          ${EMOJIES.map((item) => `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${item}" value="${item}" ${item === emoji ? 'checked' : ''}>
             <label class="film-details__emoji-label" for="emoji-${item}">
               <img src="./images/emoji/${item}.png" width="30" height="30" alt="emoji">
-            </label>`
-          ).join('')}
+            </label>`).join('')}
           </div>
         </div>
       </section>
