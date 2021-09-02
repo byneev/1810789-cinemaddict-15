@@ -1,9 +1,7 @@
-import { getCountByFilters } from '../mock/filters-mock.js';
 import AbstractElement from './abstract-element.js';
 
-const getProfile = (films) => {
-  const countByFilters = getCountByFilters(films);
-  const { isWatchedCount } = countByFilters;
+const getProfile = (filmsCountByFilters) => {
+  const { isWatchedCount } = filmsCountByFilters;
   if (isWatchedCount === 0) {
     return;
   }

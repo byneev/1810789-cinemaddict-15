@@ -4,8 +4,7 @@ const getRandomInteger = (start = 0, end = 1) => Math.floor(start + Math.random(
 
 const getRandomFloat = (start = 4, end = 10, count = 1) => (start + Math.random() * (end - start)).toFixed(count);
 
-const generateValuesFromArray = (array) =>
-  array.sort(() => Math.random() - Math.random()).slice(0, Math.floor(getRandomInteger(1, array.length / 3)));
+const generateValuesFromArray = (array) => array.sort(() => Math.random() - Math.random()).slice(0, Math.floor(getRandomInteger(1, array.length / 3)));
 
 const createElement = (template) => {
   const temp = document.createElement('div');
@@ -31,4 +30,10 @@ const replace = (newChild, oldChild) => {
 
 const updateArray = (array, updatedItem) => array.map((item) => (item.id === updatedItem.id ? updatedItem : item));
 
-export { getRandomInteger, getRandomFloat, generateValuesFromArray, createElement, remove, replace, updateArray };
+const getCountByFilters = (films) => ({
+  isWatchedCount: films.filter((film) => film.userDetails.isWatched).length,
+  isInWatchlistCount: films.filter((film) => film.userDetails.isInWatchlist).length,
+  isFavoriteCount: films.filter((film) => film.userDetails.isFavorite).length,
+});
+
+export { getRandomInteger, getRandomFloat, generateValuesFromArray, createElement, remove, replace, updateArray, getCountByFilters };

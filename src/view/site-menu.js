@@ -1,9 +1,7 @@
-import { getCountByFilters } from '../mock/filters-mock.js';
 import AbstractElement from './abstract-element.js';
 
-const getSiteMenu = (films) => {
-  const countByFilters = getCountByFilters(films);
-  const { isWatchedCount, isInWatchlistCount, isFavoriteCount } = countByFilters;
+const getSiteMenu = (filmsCountByFilters) => {
+  const { isWatchedCount, isInWatchlistCount, isFavoriteCount } = filmsCountByFilters;
   return `<nav class="main-navigation">
   <div class="main-navigation__items">
     <a href="#all" class="main-navigation__item">All movies</a>
