@@ -84,7 +84,7 @@ export default class FilmPresenter {
   }
 
   _clickFavoriteHandler() {
-    const updateType = this._filterModel.getCurrentFilterType === FilterType.FAVORITES ? UpdateType.MAJOR : UpdateType.MINOR;
+    const updateType = this._filterModel.getCurrentFilterType() === FilterType.FAVORITES ? UpdateType.MAJOR : UpdateType.MINOR;
     this.changeData(
       updateType,
       Object.assign({}, this._film, {
@@ -93,12 +93,14 @@ export default class FilmPresenter {
           isFavorite: !this._film.userDetails.isFavorite,
           isInWatchlist: this._film.userDetails.isInWatchlist,
         },
-      })
+      }),
+      FilterType.FAVORITES,
+      this._film.userDetails.isFavorite ? -1 : 1
     );
   }
 
   _clickWatchlistHandler() {
-    const updateType = this._filterModel.getCurrentFilterType === FilterType.WATCHLIST ? UpdateType.MAJOR : UpdateType.MINOR;
+    const updateType = this._filterModel.getCurrentFilterType() === FilterType.WATCHLIST ? UpdateType.MAJOR : UpdateType.MINOR;
     this.changeData(
       updateType,
       Object.assign({}, this._film, {
@@ -107,12 +109,14 @@ export default class FilmPresenter {
           isFavorite: this._film.userDetails.isFavorite,
           isInWatchlist: !this._film.userDetails.isInWatchlist,
         },
-      })
+      }),
+      FilterType.WATCHLIST,
+      this._film.userDetails.isInWatchlist ? -1 : 1
     );
   }
 
   _clickWatchedHandler() {
-    const updateType = this._filterModel.getCurrentFilterType === FilterType.HISTORY ? UpdateType.MAJOR : UpdateType.MINOR;
+    const updateType = this._filterModel.getCurrentFilterType() === FilterType.HISTORY ? UpdateType.MAJOR : UpdateType.MINOR;
     this.changeData(
       updateType,
       Object.assign({}, this._film, {
@@ -121,7 +125,9 @@ export default class FilmPresenter {
           isFavorite: this._film.userDetails.isFavorite,
           isInWatchlist: this._film.userDetails.isInWatchlist,
         },
-      })
+      }),
+      FilterType.HISTORY,
+      this._film.userDetails.isWatched ? -1 : 1
     );
   }
 }

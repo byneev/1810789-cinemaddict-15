@@ -12,11 +12,21 @@ export default class SiteMenu extends AbstractObserver {
     this._filters = filters;
   }
 
+  updateFilters(filterType, change) {
+    this._filters[filterType] = this._filters[filterType] + change;
+    this._notify;
+  }
+
   getFilters() {
     return this._filters;
   }
 
   getCurrentFilterType() {
     return this._currentFilterType;
+  }
+
+  setCurrentFilterType(filterType) {
+    this._currentFilterType = filterType;
+    this._notify(this._currentFilterType);
   }
 }

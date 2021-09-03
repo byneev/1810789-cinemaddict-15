@@ -13,6 +13,9 @@ const createElement = (template) => {
 };
 
 const remove = (component) => {
+  if (!component) {
+    return;
+  }
   component.getElement().remove();
   component.removeElement();
 };
@@ -31,9 +34,9 @@ const replace = (newChild, oldChild) => {
 const updateArray = (array, updatedItem) => array.map((item) => (item.id === updatedItem.id ? updatedItem : item));
 
 const getCountByFilters = (films) => ({
-  isWatchedCount: films.filter((film) => film.userDetails.isWatched).length,
-  isInWatchlistCount: films.filter((film) => film.userDetails.isInWatchlist).length,
-  isFavoriteCount: films.filter((film) => film.userDetails.isFavorite).length,
+  isWatched: [...films].filter((film) => film.userDetails.isWatched).length,
+  isInWatchlist: [...films].filter((film) => film.userDetails.isInWatchlist).length,
+  isFavorite: [...films].filter((film) => film.userDetails.isFavorite).length,
 });
 
 export { getRandomInteger, getRandomFloat, generateValuesFromArray, createElement, remove, replace, updateArray, getCountByFilters };

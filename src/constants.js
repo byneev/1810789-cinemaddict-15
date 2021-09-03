@@ -34,9 +34,9 @@ export const EMOJIES = ['smile', 'sleeping', 'puke', 'angry'];
 
 export const FilterType = {
   ALL: 'all',
-  WATCHLIST: 'inWatchlist',
-  HISTORY: 'watched',
-  FAVORITES: 'favorite',
+  WATCHLIST: 'isInWatchlist',
+  HISTORY: 'isWatched',
+  FAVORITES: 'isFavorite',
 };
 
 export const SortType = {
