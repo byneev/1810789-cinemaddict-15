@@ -14,7 +14,6 @@ export default class SiteMenu extends AbstractObserver {
 
   updateFilters(filterType, change) {
     this._filters[filterType] = this._filters[filterType] + change;
-    this._notify;
   }
 
   getFilters() {

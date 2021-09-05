@@ -8,9 +8,8 @@ const getNewComment = (data) => {
     (item) => `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${item}" value="${item}" ${item === data.emoji ? 'checked' : ''}>
       <label class="film-details__emoji-label" for="emoji-${item}">
         <img src="./images/emoji/${item}.png" width="30" height="30" alt="emoji">
-      </label>`
-  ).join('');
-  const newC = `<div class="film-details__new-comment"><div class="film-details__add-emoji-label">
+      </label>`).join('');
+  const newComment = `<div class="film-details__new-comment"><div class="film-details__add-emoji-label">
     ${!data.emoji ? '' : currentEmoji}
     </div>
     <label class="film-details__comment-label">
@@ -20,7 +19,7 @@ const getNewComment = (data) => {
     ${emojisList}
     </div>
   </div>`;
-  return newC;
+  return newComment;
 };
 
 export default class NewComment extends Smart {
@@ -32,7 +31,12 @@ export default class NewComment extends Smart {
       description: null,
     };
     this._clickEmojiHandler = this._clickEmojiHandler.bind(this);
+    this._addCommentKeydownHandler = this._addCommentKeydownHandler.bind(this);
     this._setInnerHandlers();
+  }
+
+  getData() {
+    return this._data;
   }
 
   updateData(data) {
@@ -47,6 +51,15 @@ export default class NewComment extends Smart {
     });
   }
 
+  _addCommentKeydownHandler(evt) {
+    this._callback.addComment(evt);
+  }
+
+  setAddCommentKeydownHandler(callback) {
+    this._callback.addComment = callback;
+    this.getElement().querySelector('.film-details__comment-input').addEventListener('keydown', this._addCommentKeydownHandler);
+  }
+
   _setInnerHandlers() {
     const labels = this.getElement().querySelectorAll('.film-details__emoji-label');
     [...labels].forEach((label) => label.addEventListener('click', this._clickEmojiHandler));
@@ -59,6 +72,7 @@ export default class NewComment extends Smart {
 
   restoreHandlers() {
     this._setInnerHandlers();
+    this.getElement().querySelector('.film-details__comment-input').addEventListener('keydown', this._addCommentKeydownHandler);
   }
 
   getTemplate() {

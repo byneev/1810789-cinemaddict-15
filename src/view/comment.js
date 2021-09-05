@@ -12,7 +12,7 @@ const formatDateByOld = (date) => {
 };
 
 const getComment = (comment) => {
-  const { author, message, date, emotion } = comment;
+  const { author, message, date, emotion, id } = comment;
   return `<li class="film-details__comment">
   <span class="film-details__comment-emoji">
     <img src=".${emotion}" width="55" height="55" alt="emoji-smile">
@@ -22,7 +22,7 @@ const getComment = (comment) => {
     <p class="film-details__comment-info">
       <span class="film-details__comment-author">${author}</span>
       <span class="film-details__comment-day">${date !== null ? formatDateByOld(date) : ''}</span>
-      <button class="film-details__comment-delete">Delete</button>
+      <button data-id="${id}" class="film-details__comment-delete">Delete</button>
     </p>
   </div>
 </li>`;
@@ -32,11 +32,12 @@ export default class Comment extends AbstractElement {
   constructor(comment) {
     super();
     this._comment = comment;
+    this._commentDeleteHandler = this._commentDeleteHandler.bind(this);
   }
 
   _commentDeleteHandler(evt) {
     evt.preventDefault();
-    this._callback.deleteHandler();
+    this._callback.deleteHandler(evt);
   }
 
   setCommentDeleteHandler(callback) {

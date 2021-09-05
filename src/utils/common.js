@@ -1,3 +1,4 @@
+import { SortType } from '../constants.js';
 import AbstractElement from '../view/abstract-element';
 
 const getRandomInteger = (start = 0, end = 1) => Math.floor(start + Math.random() * (end - start + 1));
@@ -39,4 +40,15 @@ const getCountByFilters = (films) => ({
   isFavorite: [...films].filter((film) => film.userDetails.isFavorite).length,
 });
 
-export { getRandomInteger, getRandomFloat, generateValuesFromArray, createElement, remove, replace, updateArray, getCountByFilters };
+const sortByType = (films, sortType) => {
+  switch (sortType) {
+    case SortType.DATE:
+      return films.slice().sort((filmA, filmB) => filmA.realiseDate - filmB.realiseDate);
+    case SortType.RATING:
+      return films.slice().sort((filmA, filmB) => filmB.rating - filmA.rating);
+    case SortType.DEFAULT:
+      return films;
+  }
+};
+
+export { getRandomInteger, getRandomFloat, generateValuesFromArray, createElement, remove, replace, updateArray, getCountByFilters, sortByType };

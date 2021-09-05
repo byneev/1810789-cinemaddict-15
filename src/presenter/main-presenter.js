@@ -1,5 +1,5 @@
-import { FilterType, UpdateType } from '../constants.js';
-import { remove, replace } from '../utils/common.js';
+import { FilterType, SortType, UpdateType } from '../constants.js';
+import { remove, replace, sortByType } from '../utils/common.js';
 import { render, RenderPosition } from '../utils/render.js';
 import FilmListEmptyView from '../view/films-list-empty.js';
 import FilmsListView from '../view/films-list.js';
@@ -11,13 +11,15 @@ import SortView from '../view/sort.js';
 import { getCountByFilters } from '../utils/common.js';
 
 const MAX_FILMS_COUNT = 5;
-//TODO При нажатии фаворит вотчед и т д текуший фильтр становится фаворит вотчед и т д
+//TODO 6-й фильм багает
 //TODO При нажатии фаворт вотчед и т д в попапе, все ломается
 export default class MainPresenter {
-  constructor(mainContainer, headerContainer, filmsModel, filterModel) {
+  constructor(mainContainer, headerContainer, filmsModel, filterModel, commentModel) {
     this._currentFilter = FilterType.ALL;
-    this._filterModel = filterModel; //реализовать модель фильтров
+    this._currentSortType = SortType.DEFAULT;
+    this._filterModel = filterModel;
     this._filmsModel = filmsModel;
+    this._commentModel = commentModel;
     this._renderedFilmsCount = MAX_FILMS_COUNT;
     this._filmPresenters = new Map();
     this._mainContainer = mainContainer;
@@ -34,19 +36,26 @@ export default class MainPresenter {
     this._handleSiteMenuClick = this._handleSiteMenuClick.bind(this);
     this._handleFilterModelEvent = this._handleFilterModelEvent.bind(this);
     this._handleSiteMenuViewAction = this._handleSiteMenuViewAction.bind(this);
+    this._sortItemClickHandler = this._sortItemClickHandler.bind(this);
   }
 
   _getFilms() {
+    let currentFilms = [];
     switch (this._currentFilter) {
       case FilterType.WATCHLIST:
-        return this._filmsModel.getFilms().filter((film) => film.userDetails.isInWatchlist);
+        currentFilms = this._filmsModel.getFilms().filter((film) => film.userDetails.isInWatchlist);
+        break;
       case FilterType.HISTORY:
-        return this._filmsModel.getFilms().filter((film) => film.userDetails.isWatched);
+        currentFilms = this._filmsModel.getFilms().filter((film) => film.userDetails.isWatched);
+        break;
       case FilterType.FAVORITES:
-        return this._filmsModel.getFilms().filter((film) => film.userDetails.isFavorite);
+        currentFilms = this._filmsModel.getFilms().filter((film) => film.userDetails.isFavorite);
+        break;
       default:
-        return this._filmsModel.getFilms();
+        currentFilms = this._filmsModel.getFilms();
+        break;
     }
+    return sortByType(currentFilms, this._currentSortType);
   }
 
   init() {
@@ -65,7 +74,6 @@ export default class MainPresenter {
   _handleFilmViewAction(updateType, update, filterType = FilterType.ALL, filterUpdate) {
     this._filterModel.updateFilters(filterType, filterUpdate);
     this._filmsModel.updateFilm(updateType, update);
-    this._filterModel.setCurrentFilterType(filterType);
   }
 
   _handleSiteMenuViewAction(filterType) {
@@ -73,22 +81,29 @@ export default class MainPresenter {
   }
 
   _handleFilterModelEvent(filterType) {
-    if (filterType === this._currentFilter) {
-      return;
-    }
     this._currentFilter = filterType;
     this._renderedFilmsCount = MAX_FILMS_COUNT;
     this._clearBoard();
     this._renderBoard();
   }
 
-  _handleRenderPopup(film) {
-    this._filmPresenters.get(film.id).isOpen = true;
+  _sortItemClickHandler(evt) {
+    const sortType = evt.target.dataset.sort;
+    if (sortType === this._currentSortType) {
+      return;
+    }
+    this._currentSortType = sortType;
+    this._clearBoard();
+    this._renderBoard();
+  }
+
+  _handleRenderPopup(film, isOpen) {
+    this._filmPresenters.get(film.id).isOpen = isOpen;
   }
 
   _renderUpdatedFilm(data) {
     const currentFilmPresenter = this._filmPresenters.get(data.id);
-    currentFilmPresenter.init(data);
+    this._filmPresenters.get(data.id).init(data);
     if (currentFilmPresenter.isOpen) {
       const currentScroll = currentFilmPresenter._filmDetailsComponent.getElement().scrollTop;
       this._closeAllPopups();
@@ -98,9 +113,10 @@ export default class MainPresenter {
   }
 
   _replaceSiteMenu() {
-    const newSiteMenu = new SiteMenuView(this._filterModel.getFilters());
+    const newSiteMenu = new SiteMenuView(this._filterModel.getFilters(), this._currentFilter);
     replace(newSiteMenu, this._siteMenuComponent);
     this._siteMenuComponent = newSiteMenu;
+    this._siteMenuComponent.setSiteMenuItemClickHandler(this._handleSiteMenuClick);
   }
 
   _replaceProfile() {
@@ -113,18 +129,17 @@ export default class MainPresenter {
     switch (updateType) {
       case UpdateType.MINOR:
         this._renderUpdatedFilm(data);
-        this._replaceSiteMenu();
+        this._currentFilter = this._filterModel.getCurrentFilterType();
+        this._replaceSiteMenu(); // если добавляется в фаворит, вотчед и т.д., нужно не не переходить в текущий фильтр
         this._replaceProfile();
         break;
       case UpdateType.MAJOR:
+        this._closeAllPopups();
         this._clearBoard();
+        this._currentFilter = this._filterModel.getCurrentFilterType();
         this._renderBoard();
         break;
-      // очистить фильм-лист
-      // отрисовать фильм-лист
-      // обновить фильтры
       case UpdateType.PATCH:
-      //
     }
   }
 
@@ -132,12 +147,13 @@ export default class MainPresenter {
     this._filmPresenters.forEach((value) => {
       if (value.isOpen) {
         value._closePopup();
+        value.isOpen = false;
       }
     });
   }
 
   _renderFilm(film) {
-    this._filmPresenter = new FilmPresenter(this._filmsListContainer, this._handleFilmViewAction, this._closeAllPopups, this._filmsModel, this._filterModel, this._handleRenderPopup);
+    this._filmPresenter = new FilmPresenter(this._filmsListContainer, this._handleFilmViewAction, this._closeAllPopups, this._filmsModel, this._filterModel, this._commentModel, this._handleRenderPopup);
     this._filmPresenter.init(film);
     this._filmPresenters.set(film.id, this._filmPresenter);
   }
@@ -164,7 +180,8 @@ export default class MainPresenter {
     this._siteMenuComponent = new SiteMenuView(this._filterModel.getFilters(), this._currentFilter);
     this._siteMenuComponent.setSiteMenuItemClickHandler(this._handleSiteMenuClick);
     this._profileComponent = new ProfileView(this._filterModel.getFilters());
-    this._sortViewComponent = new SortView();
+    this._sortViewComponent = new SortView(this._currentSortType);
+    this._sortViewComponent.setSortItemClickHandler(this._sortItemClickHandler);
     render(this._headerContainer, this._profileComponent, RenderPosition.BEFOREEND);
     render(this._mainContainer, this._siteMenuComponent, RenderPosition.BEFOREEND);
     render(this._mainContainer, this._sortViewComponent, RenderPosition.BEFOREEND);
