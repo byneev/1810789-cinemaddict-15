@@ -1,5 +1,6 @@
 import AbstractElement from './abstract-element.js';
 import dayjs from 'dayjs';
+import he from 'he';
 
 const formatDateByOld = (date) => {
   let result = dayjs(date).format('YYYY/MM/DD hh:mm');
@@ -18,7 +19,7 @@ const getComment = (comment) => {
     <img src=".${emotion}" width="55" height="55" alt="emoji-smile">
   </span>
   <div>
-    <p class="film-details__comment-text">${message}</p>
+    <p class="film-details__comment-text">${he.encode(message)}</p>
     <p class="film-details__comment-info">
       <span class="film-details__comment-author">${author}</span>
       <span class="film-details__comment-day">${date !== null ? formatDateByOld(date) : ''}</span>

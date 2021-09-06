@@ -69,7 +69,6 @@ export default class FilmPresenter {
     if (event) {
       this._newCommentComponent.updateData(this._savedNewComment.getData());
     }
-    this._filmDetailsComponent.set;
     this._film.commentsList = this._commentModel.getComments();
     this._filmsModel.updateFilm(UpdateType.PATCH, this._film);
   }
