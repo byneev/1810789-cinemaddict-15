@@ -50,3 +50,15 @@ export const UpdateType = {
   MAJOR: 'major',
   PATCH: 'patch',
 };
+
+export const MethodType = {
+  GET: 'GET',
+  PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
+};
+
+export const DataType = {
+  FILM: 'comment',
+  COMMENT: 'comment',
+};

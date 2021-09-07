@@ -14,12 +14,13 @@ const MAX_FILMS_COUNT = 5;
 //TODO 6-й фильм багает
 //TODO При нажатии фаворт вотчед и т д в попапе, все ломается
 export default class MainPresenter {
-  constructor(mainContainer, headerContainer, filmsModel, filterModel, commentModel) {
+  constructor(mainContainer, headerContainer, filmsModel, filterModel, commentModel, api) {
     this._currentFilter = FilterType.ALL;
     this._currentSortType = SortType.DEFAULT;
     this._filterModel = filterModel;
     this._filmsModel = filmsModel;
     this._commentModel = commentModel;
+    this._api = api;
     this._renderedFilmsCount = MAX_FILMS_COUNT;
     this._filmPresenters = new Map();
     this._mainContainer = mainContainer;
@@ -61,6 +62,7 @@ export default class MainPresenter {
   init() {
     const filmsCountByFilters = getCountByFilters(this._getFilms());
     this._filterModel.setFilters(filmsCountByFilters);
+    this._api.getFilms().then((films) => this._filmsModel.setFilms(films));
     this._filmsModel.addObserver(this._handleFilmsModelEvent);
     this._filterModel.addObserver(this._handleFilterModelEvent);
     this._renderBoard();
