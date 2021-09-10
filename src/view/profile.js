@@ -1,18 +1,16 @@
-import { getCountByFilters } from '../mock/filters-mock.js';
 import AbstractElement from './abstract-element.js';
 
-const getProfile = (films) => {
-  const countByFilters = getCountByFilters(films);
-  const { isWatchedCount } = countByFilters;
-  if (isWatchedCount === 0) {
-    return;
+const getProfile = (filmsCountByFilters) => {
+  const { isWatched } = filmsCountByFilters;
+  if (isWatched === 0) {
+    return '<section class="header__profile profile"></section>';
   }
   let profileString;
-  if (isWatchedCount > 0 && isWatchedCount <= 10) {
+  if (isWatched > 0 && isWatched <= 10) {
     profileString = 'novice';
-  } else if (isWatchedCount > 10 && isWatchedCount <= 20) {
+  } else if (isWatched > 10 && isWatched <= 20) {
     profileString = 'fan';
-  } else if (isWatchedCount > 20) {
+  } else if (isWatched > 20) {
     profileString = 'movie buff';
   }
   return `<section class="header__profile profile">
@@ -22,12 +20,12 @@ const getProfile = (films) => {
 };
 
 export default class Profile extends AbstractElement {
-  constructor(films) {
+  constructor(filters) {
     super();
-    this._films = films;
+    this._filters = filters;
   }
 
   getTemplate() {
-    return getProfile(this._films);
+    return getProfile(this._filters);
   }
 }
