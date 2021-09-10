@@ -49,6 +49,7 @@ export const UpdateType = {
   MINOR: 'minor',
   MAJOR: 'major',
   PATCH: 'patch',
+  INIT: 'init',
 };
 
 export const MethodType = {
@@ -59,6 +60,6 @@ export const MethodType = {
 };
 
 export const DataType = {
-  FILM: 'comment',
+  FILM: 'film',
   COMMENT: 'comment',
 };

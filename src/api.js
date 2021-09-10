@@ -1,4 +1,4 @@
-import { DataType, MethodType } from './constants.js';
+import { DataType, MethodType, UpdateType } from './constants.js';
 import Adapter from './utils/adapter.js';
 
 export default class Api {
@@ -8,23 +8,29 @@ export default class Api {
   }
 
   getFilms() {
-    return this._load('movies').then((movies) => Adapter.serverToClientData(movies, DataType.FILM));
+    return this._load({ url: 'movies' })
+      .then((response) => response.json())
+      .then((movies) => movies.map((movie) => Adapter.serverToClientData(movie, DataType.FILM)));
   }
 
   updateFilm(update) {
-    return this._load(`movies/${update.id}`, {
+    return this._load({
+      url: `movies/${update.id}`,
       method: MethodType.PUT,
-      body: JSON.stringify(Adapter.cLientToServerData(update)),
+      body: JSON.stringify(Adapter.cLientToServerData(update, DataType.FILM)),
       headers: new Headers({ 'Content-Type': 'application/json' }),
-    });
+    }).then((response) => response.json());
   }
 
-  getComments(film) {
-    return this._load(`comments/${film.id}`).then((comments) => Adapter.serverToClientData(comments, DataType.COMMENT));
+  getComments(id) {
+    return this._load({ url: `comments/${id}` })
+      .then((response) => response.json())
+      .then((comments) => comments.map((comment) => Adapter.serverToClientData(comment, DataType.COMMENT)));
   }
 
-  deleteComment(comment) {
-    this._load(`comments/${comment.id}`, {
+  deleteComment(id) {
+    return this._load({
+      url: `comments/${id}`,
       method: MethodType.DELETE,
     });
   }
@@ -36,17 +42,21 @@ export default class Api {
     });
   }
 
-  _load(url, method = MethodType.GET, body = null, headers = new Headers()) {
+  _load({ url, method = MethodType.GET, body = null, headers = new Headers() }) {
     headers.append('Authorization', this._authorization);
-    return fetch(`${this._adress}${url}`, {
+    return fetch(`${this._adress}/${url}`, {
       method,
       body,
       headers,
-    }).then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error(`Error ${response.status}`);
-    });
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response;
+        }
+        throw new Error(response.status);
+      })
+      .catch((error) => {
+        throw error;
+      });
   }
 }

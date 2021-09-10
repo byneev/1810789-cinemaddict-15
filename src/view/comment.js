@@ -14,9 +14,10 @@ const formatDateByOld = (date) => {
 
 const getComment = (comment) => {
   const { author, message, date, emotion, id } = comment;
+  const emotionUrl = `/images/emoji/${emotion}.png`;
   return `<li class="film-details__comment">
   <span class="film-details__comment-emoji">
-    <img src=".${emotion}" width="55" height="55" alt="emoji-smile">
+    <img src="${emotionUrl}" width="55" height="55" alt="emoji-smile">
   </span>
   <div>
     <p class="film-details__comment-text">${he.encode(message)}</p>

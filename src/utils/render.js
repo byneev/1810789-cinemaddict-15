@@ -14,7 +14,6 @@ const render = (container, child, place) => {
   if (child instanceof AbstractElement) {
     child = child.getElement();
   }
-
   switch (place) {
     case RenderPosition.AFTERBEGIN:
       container.prepend(child);

@@ -10,7 +10,7 @@ import FilmDetailsView from '../view/film-details.js';
 import NewCommentView from '../view/new-comment.js';
 
 export default class FilmPresenter {
-  constructor(container, changeData, closeAllPopups, filmsModel, filterModel, commentModel, setPopupStatus) {
+  constructor(container, changeData, closeAllPopups, filmsModel, filterModel, commentModel, setPopupStatus, api) {
     this.isOpen = false;
     this._filterModel = filterModel;
     this._filmsModel = filmsModel;
@@ -19,6 +19,7 @@ export default class FilmPresenter {
     this._container = container;
     this.changeData = changeData;
     this.setPopupStatus = setPopupStatus;
+    this._api = api;
     this._filmCardComponent = null;
     this._filmDetailsComponent = null;
     this._newCommentComponent = null;
@@ -35,7 +36,7 @@ export default class FilmPresenter {
   }
 
   init(filmData) {
-    this._film = filmData;
+    this._id = filmData.id;
     const oldFilmCard = this._filmCardComponent;
     this._filmCardComponent = new FilmCardView(filmData);
     this._filmCardComponent.setClickHandler(this._clickHandler);
@@ -60,17 +61,24 @@ export default class FilmPresenter {
   _handleCommentViewAction(evt) {
     this._savedNewComment = this._newCommentComponent;
     const id = evt.target.dataset.id;
-    this._commentModel.deleteComment(id);
+    this._api.deleteComment(id).then(() => {
+      this._commentModel.deleteComment(id);
+    });
   }
 
   _handleCommentModelEvent(event) {
     this._clearCommentsBlock();
-    this._renderCommentsBlock();
+    this._renderCommentsBlock(this._commentModel.getComments());
     if (event) {
       this._newCommentComponent.updateData(this._savedNewComment.getData());
     }
-    this._film.commentsList = this._commentModel.getComments();
-    this._filmsModel.updateFilm(UpdateType.PATCH, this._film);
+    //TODO Update filmModel and filmServer
+
+    this._api
+      .updateFilm(Object.assign({}, this._filmsModel.getFilmById(this._id)), {
+        commentsList: this._commentModel.getComments(),
+      })
+      .then((update) => this._filmsModel.updateFilm(UpdateType.PATCH, update));
   }
 
   _newCommentKeydownHandler(evt) {
@@ -106,12 +114,12 @@ export default class FilmPresenter {
     remove(this._commentsBlockComponent);
   }
 
-  _renderCommentsBlock() {
+  _renderCommentsBlock(filmComments) {
     const popupContainer = this._filmDetailsComponent.getElement().querySelector('.film-details__inner');
-    this._commentsBlockComponent = new CommentsBlockView(this._commentModel.getComments().length);
+    this._commentsBlockComponent = new CommentsBlockView(filmComments.length);
     render(popupContainer, this._commentsBlockComponent, RenderPosition.BEFOREEND);
     this.commentsContainer = this._commentsBlockComponent.getElement().querySelector('.film-details__comments-list');
-    this._commentModel.getComments().forEach((comment) => {
+    filmComments.forEach((comment) => {
       const commentComponent = new CommentView(comment);
       commentComponent.setCommentDeleteHandler(this._handleCommentViewAction);
       render(this.commentsContainer, commentComponent, RenderPosition.BEFOREEND);
@@ -123,9 +131,10 @@ export default class FilmPresenter {
     document.body.addEventListener('keydown', this._onEscapeKeydown);
   }
 
-  _renderPopup(film) {
+  _renderPopup(id) {
+    const film = this._filmsModel.getFilmById(id);
+    this._id = id;
     this.setPopupStatus(film, true);
-    this._commentModel.setComments(film.commentsList);
     this._filmDetailsComponent = new FilmDetailsView(film);
     this._filmDetailsComponent.setCloseButtonClickHandler(this._closePopup);
     this._filmDetailsComponent.setFavoriteClickHandler(this._clickFavoriteHandler);
@@ -134,18 +143,21 @@ export default class FilmPresenter {
     document.body.addEventListener('keydown', this._onEscapeKeydown);
     document.body.classList.add('hide-overflow');
     render(document.body, this._filmDetailsComponent, RenderPosition.BEFOREEND);
-    this._renderCommentsBlock(false);
+    this._api.getComments(film.id).then((comments) => {
+      this._commentModel.setComments(comments);
+      this._renderCommentsBlock(comments);
+    });
   }
 
   _closePopup() {
-    this.setPopupStatus(this._film, false);
+    this.isOpen = false;
     remove(this._filmDetailsComponent);
     document.body.classList.remove('hide-overflow');
   }
 
   _clickHandler() {
     this._closeAllPopups();
-    this._renderPopup(this._film);
+    this._renderPopup(this._id);
   }
 
   _clickFavoriteHandler() {
@@ -157,10 +169,11 @@ export default class FilmPresenter {
           isWatched: this._film.userDetails.isWatched,
           isFavorite: !this._film.userDetails.isFavorite,
           isInWatchlist: this._film.userDetails.isInWatchlist,
+          watchingDate: this._film.userDetails.watchingDate,
         },
       }),
       FilterType.FAVORITES,
-      this._film.userDetails.isFavorite ? -1 : 1,
+      this._film.userDetails.isFavorite ? -1 : 1
     );
   }
 
@@ -173,10 +186,11 @@ export default class FilmPresenter {
           isWatched: this._film.userDetails.isWatched,
           isFavorite: this._film.userDetails.isFavorite,
           isInWatchlist: !this._film.userDetails.isInWatchlist,
+          watchingDate: this._film.userDetails.watchingDate,
         },
       }),
       FilterType.WATCHLIST,
-      this._film.userDetails.isInWatchlist ? -1 : 1,
+      this._film.userDetails.isInWatchlist ? -1 : 1
     );
   }
 
@@ -189,10 +203,11 @@ export default class FilmPresenter {
           isWatched: !this._film.userDetails.isWatched,
           isFavorite: this._film.userDetails.isFavorite,
           isInWatchlist: this._film.userDetails.isInWatchlist,
+          watchingDate: this._film.userDetails.watchingDate,
         },
       }),
       FilterType.HISTORY,
-      this._film.userDetails.isWatched ? -1 : 1,
+      this._film.userDetails.isWatched ? -1 : 1
     );
   }
 }

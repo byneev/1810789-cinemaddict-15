@@ -15,7 +15,7 @@ export default class Comments extends AbstractObserver {
   }
 
   deleteComment(id) {
-    this._comments = this._comments.filter((comment) => comment.id !== +id);
+    this._comments = this._comments.filter((comment) => comment.id !== id);
     this._notify(true);
   }
 
