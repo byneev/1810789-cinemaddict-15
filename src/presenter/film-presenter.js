@@ -1,6 +1,4 @@
-import dayjs from 'dayjs';
-import { DataType, FilterType, UpdateType } from '../constants.js';
-import { generateComment } from '../mock/comment-mock.js';
+import { DataType, DEFAULT_POPUP_SCROLL, FilterType, UpdateType } from '../constants.js';
 import Adapter from '../utils/adapter.js';
 import { remove, replace } from '../utils/common.js';
 import { render, RenderPosition } from '../utils/render.js';
@@ -23,6 +21,7 @@ export default class FilmPresenter {
     this._api = api;
     this._filmCardComponent = null;
     this._filmDetailsComponent = null;
+    this._savedNewComment = null;
     this._newCommentComponent = null;
     this._clickHandler = this._clickHandler.bind(this);
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
@@ -53,6 +52,8 @@ export default class FilmPresenter {
     remove(oldFilmCard);
   }
 
+  // TODO Реализовать изменение добавления в избранное etc в Popup
+
   _onEscapeKeydown(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       this._closeAllPopups();
@@ -67,20 +68,18 @@ export default class FilmPresenter {
     });
   }
 
-  _handleCommentModelEvent(event) {
+  _handleCommentModelEvent() {
     this._clearCommentsBlock();
     this._renderCommentsBlock(this._commentModel.getComments());
-    if (event) {
+    if (this._savedNewComment !== null) {
       this._newCommentComponent.updateData(this._savedNewComment.getData());
     }
-    this._api
-      .updateFilm(Object.assign({}, this._filmsModel.getFilmById(this._id)), {
+    this._filmsModel.updateFilm(
+      UpdateType.MINOR,
+      Object.assign({}, this._filmsModel.getFilmById(this._id), {
         commentsList: this._commentModel.getComments(),
       })
-      .then((data) => {
-        const film = Adapter.serverToClientData(data, DataType.FILM);
-        this._filmsModel.updateFilm(UpdateType.PATCH, film);
-      });
+    );
   }
 
   _newCommentKeydownHandler(evt) {
@@ -102,14 +101,12 @@ export default class FilmPresenter {
 
   _handleNewCommentAction() {
     this._savedNewComment = this._newCommentComponent;
-    const newCommentData = {
-      id: generateComment().id,
-      author: 'Username',
-      message: this._savedNewComment.getData().description,
-      date: dayjs().toDate(),
-      emotion: `/images/emoji/${this._savedNewComment.getData().emoji}.png`,
-    };
-    this._commentModel.addComment(newCommentData);
+    this._api
+      .addComment(this._id, {
+        comment: this._savedNewComment.getData().description,
+        emotion: this._savedNewComment.getData().emoji,
+      })
+      .then((response) => this._commentModel.setComments(response.comments.map((comment) => Adapter.serverToClientData(comment, DataType.COMMENT))));
   }
 
   _clearCommentsBlock() {
@@ -133,7 +130,7 @@ export default class FilmPresenter {
     document.body.addEventListener('keydown', this._onEscapeKeydown);
   }
 
-  _renderPopup(id) {
+  _renderPopup(id, currentScroll) {
     const film = this._filmsModel.getFilmById(id);
     this._id = id;
     this.setPopupStatus(film, true);
@@ -145,10 +142,12 @@ export default class FilmPresenter {
     document.body.addEventListener('keydown', this._onEscapeKeydown);
     document.body.classList.add('hide-overflow');
     render(document.body, this._filmDetailsComponent, RenderPosition.BEFOREEND);
-    this._api.getComments(film.id).then((comments) => {
-      this._commentModel.setComments(comments);
+    this._api.getComments(this._id).then((comments) => {
+      this._commentModel.setComments(comments); // здесь зацикливаемся
+      this._clearCommentsBlock();
       this._renderCommentsBlock(comments);
     });
+    this._filmDetailsComponent.getElement().scrollTop = currentScroll;
   }
 
   _closePopup() {
@@ -159,7 +158,7 @@ export default class FilmPresenter {
 
   _clickHandler() {
     this._closeAllPopups();
-    this._renderPopup(this._id);
+    this._renderPopup(this._id, DEFAULT_POPUP_SCROLL);
   }
 
   _clickFavoriteHandler() {

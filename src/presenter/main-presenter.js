@@ -113,12 +113,12 @@ export default class MainPresenter {
   _renderUpdatedFilm(data) {
     const currentFilmPresenter = this._filmPresenters.get(data.id);
     this._filmPresenters.get(data.id).init(data);
-    if (currentFilmPresenter.isOpen) {
-      const currentScroll = currentFilmPresenter._filmDetailsComponent.getElement().scrollTop;
-      this._closeAllPopups();
-      currentFilmPresenter._renderPopup(data.id);
-      currentFilmPresenter._filmDetailsComponent.getElement().scrollTop = currentScroll;
-    }
+    // из-за отрисовки попапа безконечный луп
+    // if (currentFilmPresenter.isOpen) {
+    //   const currentScroll = currentFilmPresenter._filmDetailsComponent.getElement().scrollTop;
+    //   this._closeAllPopups();
+    //   currentFilmPresenter._renderPopup(data.id, currentScroll);
+    // }
   }
 
   _replaceSiteMenu() {
@@ -137,12 +137,14 @@ export default class MainPresenter {
   _handleFilmsModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.MINOR:
+        console.log('MINOR');
         this._renderUpdatedFilm(data);
         this._currentFilter = this._filterModel.getCurrentFilterType();
         this._replaceSiteMenu();
         this._replaceProfile();
         break;
       case UpdateType.MAJOR:
+        console.log('MAJOR');
         this._closeAllPopups();
         this._clearBoard();
         this._currentFilter = this._filterModel.getCurrentFilterType();
@@ -151,6 +153,7 @@ export default class MainPresenter {
       case UpdateType.INIT:
         remove(this._loadingComponent);
         this._filterModel.setFilters(getCountByFilters(this._getFilms()));
+        this._clearBoard();
         this._renderBoard();
         break;
     }

@@ -1,3 +1,5 @@
+export const DEFAULT_POPUP_SCROLL = 0;
+
 export const POSTERS = ['made-for-each-other.png', 'popeye-meets-sinbad.png', 'sagebrush-trail.jpg', 'santa-claus-conquers-the-martians.jpg', 'the-dance-of-life.jpg', 'the-great-flamarion.jpg', 'the-man-with-the-golden-arm.jpg'];
 
 export const GENRES = ['comedy', 'fighting', 'war', 'drama', 'thriller', 'horror', 'sci-fi', 'fantasy', 'anime', 'cartoon'];

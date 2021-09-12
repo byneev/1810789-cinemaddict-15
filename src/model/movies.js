@@ -28,9 +28,9 @@ export default class Movies extends AbstractObserver {
   }
 
   updateFilm(updateType, updatedFilm) {
-    if (!this._films.map((item) => item.id).includes(updatedFilm.id)) {
-      return;
-    }
+    // if (!this._films.map((item) => item.id).includes(updatedFilm.id)) {
+    //   return;
+    // }
     this._films = updateArray(this._films, updatedFilm);
     this._notify(updateType, updatedFilm);
   }
