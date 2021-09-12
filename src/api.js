@@ -36,10 +36,12 @@ export default class Api {
   }
 
   addComment(film, newComment) {
-    return this._load(`comments/${film.id}`, {
+    return this._load({
+      url: `comments/${film.id}`,
       method: MethodType.POST,
       body: JSON.stringify(Adapter.cLientToServerData(newComment)),
-    });
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+    }).then((response) => response.json());
   }
 
   _load({ url, method = MethodType.GET, body = null, headers = new Headers() }) {

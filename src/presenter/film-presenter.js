@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
-import { FilterType, UpdateType } from '../constants.js';
+import { DataType, FilterType, UpdateType } from '../constants.js';
 import { generateComment } from '../mock/comment-mock.js';
+import Adapter from '../utils/adapter.js';
 import { remove, replace } from '../utils/common.js';
 import { render, RenderPosition } from '../utils/render.js';
 import CommentView from '../view/comment.js';
@@ -72,13 +73,14 @@ export default class FilmPresenter {
     if (event) {
       this._newCommentComponent.updateData(this._savedNewComment.getData());
     }
-    //TODO Update filmModel and filmServer
-
     this._api
       .updateFilm(Object.assign({}, this._filmsModel.getFilmById(this._id)), {
         commentsList: this._commentModel.getComments(),
       })
-      .then((update) => this._filmsModel.updateFilm(UpdateType.PATCH, update));
+      .then((data) => {
+        const film = Adapter.serverToClientData(data, DataType.FILM);
+        this._filmsModel.updateFilm(UpdateType.PATCH, film);
+      });
   }
 
   _newCommentKeydownHandler(evt) {
@@ -161,53 +163,56 @@ export default class FilmPresenter {
   }
 
   _clickFavoriteHandler() {
+    const film = this._filmsModel.getFilmById(this._id);
     const updateType = this._filterModel.getCurrentFilterType() === FilterType.FAVORITES ? UpdateType.MAJOR : UpdateType.MINOR;
     this.changeData(
       updateType,
-      Object.assign({}, this._film, {
+      Object.assign({}, film, {
         userDetails: {
-          isWatched: this._film.userDetails.isWatched,
-          isFavorite: !this._film.userDetails.isFavorite,
-          isInWatchlist: this._film.userDetails.isInWatchlist,
-          watchingDate: this._film.userDetails.watchingDate,
+          isWatched: film.userDetails.isWatched,
+          isFavorite: !film.userDetails.isFavorite,
+          isInWatchlist: film.userDetails.isInWatchlist,
+          watchingDate: film.userDetails.watchingDate,
         },
       }),
       FilterType.FAVORITES,
-      this._film.userDetails.isFavorite ? -1 : 1
+      film.userDetails.isFavorite ? -1 : 1
     );
   }
 
   _clickWatchlistHandler() {
+    const film = this._filmsModel.getFilmById(this._id);
     const updateType = this._filterModel.getCurrentFilterType() === FilterType.WATCHLIST ? UpdateType.MAJOR : UpdateType.MINOR;
     this.changeData(
       updateType,
-      Object.assign({}, this._film, {
+      Object.assign({}, film, {
         userDetails: {
-          isWatched: this._film.userDetails.isWatched,
-          isFavorite: this._film.userDetails.isFavorite,
-          isInWatchlist: !this._film.userDetails.isInWatchlist,
-          watchingDate: this._film.userDetails.watchingDate,
+          isWatched: film.userDetails.isWatched,
+          isFavorite: film.userDetails.isFavorite,
+          isInWatchlist: !film.userDetails.isInWatchlist,
+          watchingDate: film.userDetails.watchingDate,
         },
       }),
       FilterType.WATCHLIST,
-      this._film.userDetails.isInWatchlist ? -1 : 1
+      film.userDetails.isInWatchlist ? -1 : 1
     );
   }
 
   _clickWatchedHandler() {
+    const film = this._filmsModel.getFilmById(this._id);
     const updateType = this._filterModel.getCurrentFilterType() === FilterType.HISTORY ? UpdateType.MAJOR : UpdateType.MINOR;
     this.changeData(
       updateType,
-      Object.assign({}, this._film, {
+      Object.assign({}, film, {
         userDetails: {
-          isWatched: !this._film.userDetails.isWatched,
-          isFavorite: this._film.userDetails.isFavorite,
-          isInWatchlist: this._film.userDetails.isInWatchlist,
-          watchingDate: this._film.userDetails.watchingDate,
+          isWatched: !film.userDetails.isWatched,
+          isFavorite: film.userDetails.isFavorite,
+          isInWatchlist: film.userDetails.isInWatchlist,
+          watchingDate: film.userDetails.watchingDate,
         },
       }),
       FilterType.HISTORY,
-      this._film.userDetails.isWatched ? -1 : 1
+      film.userDetails.isWatched ? -1 : 1
     );
   }
 }
