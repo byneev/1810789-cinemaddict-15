@@ -1,6 +1,6 @@
+/* eslint-disable camelcase */
 import dayjs from 'dayjs';
 import { DataType } from '../constants.js';
-import { generateFilm } from '../mock/film-mock.js';
 
 const getClientDataTemplate = () => ({
   id: null,

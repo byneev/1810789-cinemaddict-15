@@ -1,3 +1,4 @@
+import { FAN_FILM_COUNT, NOVICE_FILM_COUNT } from '../constants.js';
 import AbstractElement from './abstract-element.js';
 
 const getProfile = (filmsCountByFilters) => {
@@ -6,11 +7,11 @@ const getProfile = (filmsCountByFilters) => {
     return '<section class="header__profile profile"></section>';
   }
   let profileString;
-  if (isWatched > 0 && isWatched <= 10) {
+  if (isWatched <= NOVICE_FILM_COUNT) {
     profileString = 'novice';
-  } else if (isWatched > 10 && isWatched <= 20) {
+  } else if (isWatched > NOVICE_FILM_COUNT && isWatched <= FAN_FILM_COUNT) {
     profileString = 'fan';
-  } else if (isWatched > 20) {
+  } else if (isWatched > FAN_FILM_COUNT) {
     profileString = 'movie buff';
   }
   return `<section class="header__profile profile">

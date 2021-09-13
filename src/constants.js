@@ -1,4 +1,9 @@
 export const DEFAULT_POPUP_SCROLL = 0;
+export const ONE_DAY_SECONDS = 84600;
+export const ONE_SECOND_MILLISECONDS = 1000;
+export const SNAKE_ANIMATION_TIMEOUT = 600;
+export const NOVICE_FILM_COUNT = 10;
+export const FAN_FILM_COUNT = 20;
 
 export const POSTERS = ['made-for-each-other.png', 'popeye-meets-sinbad.png', 'sagebrush-trail.jpg', 'santa-claus-conquers-the-martians.jpg', 'the-dance-of-life.jpg', 'the-great-flamarion.jpg', 'the-man-with-the-golden-arm.jpg'];
 
@@ -64,4 +69,9 @@ export const MethodType = {
 export const DataType = {
   FILM: 'film',
   COMMENT: 'comment',
+};
+
+export const ActionType = {
+  ADD: 'add',
+  DELETE: 'delete',
 };

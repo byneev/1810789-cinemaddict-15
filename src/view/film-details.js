@@ -102,6 +102,7 @@ export default class FilmDetails extends Smart {
 
   _clickWatchedHandler(evt) {
     evt.preventDefault();
+    this._currentScroll = this.getElement().scrollTop;
     this.updateData({
       isWatched: !this._data.isWatched,
     });
@@ -110,6 +111,7 @@ export default class FilmDetails extends Smart {
 
   _clickInWatchlistHandler(evt) {
     evt.preventDefault();
+    this._currentScroll = this.getElement().scrollTop;
     this.updateData({
       isInWatchlist: !this._data.isInWatchlist,
     });
@@ -118,6 +120,7 @@ export default class FilmDetails extends Smart {
 
   _clickFavoriteHandler(evt) {
     evt.preventDefault();
+    this._currentScroll = this.getElement().scrollTop;
     this.updateData({
       isFavorite: !this._data.isFavorite,
     });

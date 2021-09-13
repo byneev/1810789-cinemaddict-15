@@ -1,3 +1,4 @@
+import { SNAKE_ANIMATION_TIMEOUT } from '../constants.js';
 import { createElement } from '../utils/common.js';
 
 export default class AbstractElement {
@@ -22,5 +23,13 @@ export default class AbstractElement {
 
   removeElement() {
     this._element = null;
+  }
+
+  snake(callback) {
+    this.getElement().style.animation = `snake ${SNAKE_ANIMATION_TIMEOUT / 1000}s`;
+    setTimeout(() => {
+      this.getElement().style.animation = '';
+      callback();
+    }, SNAKE_ANIMATION_TIMEOUT);
   }
 }

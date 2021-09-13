@@ -37,7 +37,6 @@ export default class MainPresenter {
     this._renderFilms = this._renderFilms.bind(this);
     this._handleFilmsModelEvent = this._handleFilmsModelEvent.bind(this);
     this._moreButtonClickHandler = this._moreButtonClickHandler.bind(this);
-    this._handleRenderPopup = this._handleRenderPopup.bind(this);
     this._handleSiteMenuClick = this._handleSiteMenuClick.bind(this);
     this._handleFilterModelEvent = this._handleFilterModelEvent.bind(this);
     this._handleSiteMenuViewAction = this._handleSiteMenuViewAction.bind(this);
@@ -101,10 +100,6 @@ export default class MainPresenter {
     this._renderBoard();
   }
 
-  _handleRenderPopup(film, isOpen) {
-    this._filmPresenters.get(film.id).isOpen = isOpen;
-  }
-
   _renderLoadingPage() {
     render(this._mainContainer, this._loadingComponent, RenderPosition.BEFOREEND);
   }
@@ -131,6 +126,7 @@ export default class MainPresenter {
         if (currentFilmPresenter.isOpen) {
           currentFilmPresenter._clearCommentsBlock();
           currentFilmPresenter._renderCommentsBlock(this._commentModel.getComments());
+          currentFilmPresenter._setScrollPopup(currentFilmPresenter._filmDetailsComponent.scrollTop);
         }
         this._currentFilter = this._filterModel.getCurrentFilterType();
         this._replaceSiteMenu();
@@ -161,7 +157,7 @@ export default class MainPresenter {
   }
 
   _renderFilm(film) {
-    this._filmPresenter = new FilmPresenter(this._filmsListContainer, this._handleFilmViewAction, this._closeAllPopups, this._filmsModel, this._filterModel, this._commentModel, this._handleRenderPopup, this._api);
+    this._filmPresenter = new FilmPresenter(this._filmsListContainer, this._handleFilmViewAction, this._closeAllPopups, this._filmsModel, this._filterModel, this._commentModel, this._api);
     this._filmPresenter.init(film);
     this._filmPresenters.set(film.id, this._filmPresenter);
   }
@@ -181,25 +177,39 @@ export default class MainPresenter {
     remove(this._filmsAmountComponent);
     this._filmPresenters.forEach((filmPresenter) => remove(filmPresenter._filmCardComponent));
     this._filmPresenters.clear();
-    this._closeAllPopups();
+  }
+
+  _renderSiteMenu() {
+    this._siteMenuComponent = new SiteMenuView(this._filterModel.getFilters(), this._currentFilter);
+    this._siteMenuComponent.setSiteMenuItemClickHandler(this._handleSiteMenuClick);
+    render(this._mainContainer, this._siteMenuComponent, RenderPosition.BEFOREEND);
+  }
+
+  _renderProfile() {
+    this._profileComponent = new ProfileView(this._filterModel.getFilters());
+    render(this._headerContainer, this._profileComponent, RenderPosition.BEFOREEND);
+  }
+
+  _renderSort() {
+    this._sortViewComponent = new SortView(this._currentSortType);
+    this._sortViewComponent.setSortItemClickHandler(this._sortItemClickHandler);
+    render(this._mainContainer, this._sortViewComponent, RenderPosition.BEFOREEND);
   }
 
   _renderBoard() {
     const films = this._getFilms();
-    this._siteMenuComponent = new SiteMenuView(this._filterModel.getFilters(), this._currentFilter);
-    this._siteMenuComponent.setSiteMenuItemClickHandler(this._handleSiteMenuClick);
-    this._profileComponent = new ProfileView(this._filterModel.getFilters());
-    this._sortViewComponent = new SortView(this._currentSortType);
-    this._sortViewComponent.setSortItemClickHandler(this._sortItemClickHandler);
-    render(this._headerContainer, this._profileComponent, RenderPosition.BEFOREEND);
-    render(this._mainContainer, this._siteMenuComponent, RenderPosition.BEFOREEND);
-    render(this._mainContainer, this._sortViewComponent, RenderPosition.BEFOREEND);
+    this._renderProfile();
+    this._renderSiteMenu();
+    this._renderSort();
     render(this._mainContainer, this._filmsListComponent, RenderPosition.BEFOREEND);
     this._filmsListContainer = this._filmsListComponent.getElement().querySelector('.films-list__container');
+    this._footerContainer = document.querySelector('.footer__statistics');
     if (films.length === 0) {
       const siteMenuActiveItemHref = this._siteMenuComponent.getElement().querySelector('.main-navigation__item--active').getAttribute('href');
       this._filmListEmptyComponent = new FilmListEmptyView(siteMenuActiveItemHref);
       render(this._filmsListContainer, this._filmListEmptyComponent, RenderPosition.BEFOREEND);
+      this._filmsAmountComponent = new FilmsAmountView(films);
+      render(this._footerContainer, this._filmsAmountComponent, RenderPosition.BEFOREEND);
       return;
     }
     this._renderFilms(films.slice(0, Math.min(films.length, this._renderedFilmsCount)));
@@ -208,12 +218,8 @@ export default class MainPresenter {
       render(this._filmsListContainer, this._moreButtonComponent, RenderPosition.AFTER);
       this._moreButtonComponent.setClickHandler(this._moreButtonClickHandler);
     }
-    this._footerContainer = document.querySelector('.footer__statistics');
-    this;
-    this._api.getFilms().then((movies) => {
-      this._filmsAmountComponent = new FilmsAmountView(movies);
-      render(this._footerContainer, this._filmsAmountComponent, RenderPosition.BEFOREEND);
-    });
+    this._filmsAmountComponent = new FilmsAmountView(films);
+    render(this._footerContainer, this._filmsAmountComponent, RenderPosition.BEFOREEND);
   }
 
   _moreButtonClickHandler() {

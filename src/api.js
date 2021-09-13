@@ -1,4 +1,4 @@
-import { DataType, MethodType, UpdateType } from './constants.js';
+import { DataType, MethodType } from './constants.js';
 import Adapter from './utils/adapter.js';
 
 export default class Api {
