@@ -8,7 +8,8 @@ const getNewComment = (data) => {
     (item) => `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${item}" value="${item}" ${item === data.emoji ? 'checked' : ''}>
       <label class="film-details__emoji-label" for="emoji-${item}">
         <img src="./images/emoji/${item}.png" width="30" height="30" alt="emoji">
-      </label>`).join('');
+      </label>`
+  ).join('');
   const newComment = `<div class="film-details__new-comment"><div class="film-details__add-emoji-label">
     ${!data.emoji ? '' : currentEmoji}
     </div>
@@ -49,6 +50,7 @@ export default class NewComment extends Smart {
     this.updateData({
       emoji: evt.target.parentNode.getAttribute('for').split('-')[1],
     });
+    this.restoreHandlers();
   }
 
   _addCommentKeydownHandler(evt) {

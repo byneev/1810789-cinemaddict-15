@@ -77,7 +77,7 @@ export default class FilmPresenter {
     this._filmsModel.updateFilm(
       UpdateType.MINOR,
       Object.assign({}, this._filmsModel.getFilmById(this._id), {
-        commentsList: this._commentModel.getComments(),
+        commentsList: this._commentModel.getComments().map((comment) => comment.id),
       })
     );
   }
@@ -100,6 +100,9 @@ export default class FilmPresenter {
   }
 
   _handleNewCommentAction() {
+    if (!this._newCommentComponent.getData().description || !this._newCommentComponent.getData().emoji) {
+      return;
+    }
     this._savedNewComment = this._newCommentComponent;
     this._api
       .addComment(this._id, {
@@ -143,7 +146,7 @@ export default class FilmPresenter {
     document.body.classList.add('hide-overflow');
     render(document.body, this._filmDetailsComponent, RenderPosition.BEFOREEND);
     this._api.getComments(this._id).then((comments) => {
-      this._commentModel.setComments(comments); // здесь зацикливаемся
+      this._commentModel.setComments(comments);
       this._clearCommentsBlock();
       this._renderCommentsBlock(comments);
     });

@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
 import Smart from './smart.js';
 
-const getFilmDetails = (film) => {
-  const { description, poster, title, ageRating, originalTitle, rating, producer, writers, actors, realiseDate, runtime, country, genres, userDetails } = film;
+const getFilmDetails = (data) => {
+  const { description, poster, title, ageRating, originalTitle, rating, producer, writers, actors, realiseDate, runtime, country, genres, isFavorite, isWatched, isInWatchlist } = data;
   return `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
     <div class="film-details__top-container">
@@ -87,25 +87,40 @@ export default class FilmDetails extends Smart {
 
   _filmToData() {
     return Object.assign({}, this._film, {
-      isFavorite: this.film.userDetails.isFavorite,
-      isWatched: this.film.userDetails.isWatched,
-      isInWatchlist: this.film.userDetails.isInWatchlist,
+      isFavorite: this._film.userDetails.isFavorite,
+      isWatched: this._film.userDetails.isWatched,
+      isInWatchlist: this._film.userDetails.isInWatchlist,
     });
+  }
+
+  restoreHandlers() {
+    this.getElement().querySelector('.film-details__control-button--favorite').addEventListener('click', this._clickFavoriteHandler);
+    this.getElement().querySelector('.film-details__control-button--watched').addEventListener('click', this._clickWatchedHandler);
+    this.getElement().querySelector('.film-details__control-button--watchlist').addEventListener('click', this._clickInWatchlistHandler);
+    this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._clickCloseButtonHandler);
   }
 
   _clickWatchedHandler(evt) {
     evt.preventDefault();
-
+    this.updateData({
+      isWatched: !this._data.isWatched,
+    });
     this._callback.watchedClick();
   }
 
   _clickInWatchlistHandler(evt) {
     evt.preventDefault();
+    this.updateData({
+      isInWatchlist: !this._data.isInWatchlist,
+    });
     this._callback.watchlistClick();
   }
 
   _clickFavoriteHandler(evt) {
     evt.preventDefault();
+    this.updateData({
+      isFavorite: !this._data.isFavorite,
+    });
     this._callback.favoriteClick();
   }
 
@@ -135,6 +150,6 @@ export default class FilmDetails extends Smart {
   }
 
   getTemplate() {
-    return getFilmDetails(this._film);
+    return getFilmDetails(this._data);
   }
 }

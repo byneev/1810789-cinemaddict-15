@@ -14,8 +14,6 @@ import FilmsAmountView from '../view/films-amount.js';
 import Adapter from '../utils/adapter.js';
 
 const MAX_FILMS_COUNT = 5;
-//TODO 6-й фильм багает
-//TODO При нажатии фаворт вотчед и т д в попапе, все ломается
 export default class MainPresenter {
   constructor(mainContainer, headerContainer, filmsModel, filterModel, commentModel, api) {
     this._isLoading = false;
@@ -33,6 +31,7 @@ export default class MainPresenter {
     this._loadingComponent = new LoadingPageView();
     this._filmsListComponent = new FilmsListView();
     this._filmListEmptyComponent = null;
+    this._filmsAmountComponent = null;
     this._handleFilmViewAction = this._handleFilmViewAction.bind(this);
     this._closeAllPopups = this._closeAllPopups.bind(this);
     this._renderFilms = this._renderFilms.bind(this);
@@ -110,17 +109,6 @@ export default class MainPresenter {
     render(this._mainContainer, this._loadingComponent, RenderPosition.BEFOREEND);
   }
 
-  _renderUpdatedFilm(data) {
-    const currentFilmPresenter = this._filmPresenters.get(data.id);
-    this._filmPresenters.get(data.id).init(data);
-    // из-за отрисовки попапа безконечный луп
-    // if (currentFilmPresenter.isOpen) {
-    //   const currentScroll = currentFilmPresenter._filmDetailsComponent.getElement().scrollTop;
-    //   this._closeAllPopups();
-    //   currentFilmPresenter._renderPopup(data.id, currentScroll);
-    // }
-  }
-
   _replaceSiteMenu() {
     const newSiteMenu = new SiteMenuView(this._filterModel.getFilters(), this._currentFilter);
     replace(newSiteMenu, this._siteMenuComponent);
@@ -135,16 +123,20 @@ export default class MainPresenter {
   }
 
   _handleFilmsModelEvent(updateType, data) {
+    let currentFilmPresenter;
     switch (updateType) {
       case UpdateType.MINOR:
-        console.log('MINOR');
-        this._renderUpdatedFilm(data);
+        currentFilmPresenter = this._filmPresenters.get(data.id);
+        currentFilmPresenter.init(data);
+        if (currentFilmPresenter.isOpen) {
+          currentFilmPresenter._clearCommentsBlock();
+          currentFilmPresenter._renderCommentsBlock(this._commentModel.getComments());
+        }
         this._currentFilter = this._filterModel.getCurrentFilterType();
         this._replaceSiteMenu();
         this._replaceProfile();
         break;
       case UpdateType.MAJOR:
-        console.log('MAJOR');
         this._closeAllPopups();
         this._clearBoard();
         this._currentFilter = this._filterModel.getCurrentFilterType();
@@ -186,6 +178,7 @@ export default class MainPresenter {
     remove(this._profileComponent);
     remove(this._sortViewComponent);
     remove(this._filmListEmptyComponent);
+    remove(this._filmsAmountComponent);
     this._filmPresenters.forEach((filmPresenter) => remove(filmPresenter._filmCardComponent));
     this._filmPresenters.clear();
     this._closeAllPopups();
@@ -216,7 +209,11 @@ export default class MainPresenter {
       this._moreButtonComponent.setClickHandler(this._moreButtonClickHandler);
     }
     this._footerContainer = document.querySelector('.footer__statistics');
-    render(this._footerContainer, new FilmsAmountView(films), RenderPosition.BEFOREEND);
+    this;
+    this._api.getFilms().then((movies) => {
+      this._filmsAmountComponent = new FilmsAmountView(movies);
+      render(this._footerContainer, this._filmsAmountComponent, RenderPosition.BEFOREEND);
+    });
   }
 
   _moreButtonClickHandler() {
