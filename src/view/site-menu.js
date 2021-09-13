@@ -33,8 +33,7 @@ export default class SiteMenu extends AbstractElement {
 
   setSiteMenuItemClickHandler(callback) {
     this._callback.siteMenuItemClick = callback;
-    const items = this.getElement().querySelectorAll('.main-navigation__item');
-    [...items].forEach((item) => item.addEventListener('click', this._siteMenuItemClickHandler));
+    [...this.getElement().querySelectorAll('.main-navigation__item')].forEach((item) => item.addEventListener('click', this._siteMenuItemClickHandler));
   }
 
   getTemplate() {
