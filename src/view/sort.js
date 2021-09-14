@@ -21,8 +21,7 @@ export default class Sort extends AbstractElement {
 
   setSortItemClickHandler(callback) {
     this._callback.sortItemClick = callback;
-    const sortItems = this.getElement().querySelectorAll('.sort__button');
-    [...sortItems].forEach((item) => item.addEventListener('click', this._sortItemClickHandler));
+    [...this.getElement().querySelectorAll('.sort__button')].forEach((item) => item.addEventListener('click', this._sortItemClickHandler));
   }
 
   getTemplate() {

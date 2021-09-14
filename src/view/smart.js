@@ -4,6 +4,7 @@ export default class Smart extends AbstractElement {
   constructor() {
     super();
     this._data = {};
+    this.scrollTop = 0;
   }
 
   restoreHandlers() {
@@ -12,12 +13,11 @@ export default class Smart extends AbstractElement {
 
   updateElement() {
     const prevElement = this.getElement();
+    this.scrollTop = prevElement.scrollTop;
     const parent = prevElement.parentNode;
-    const currentScroll = prevElement.scrollTop;
     this.removeElement();
     const newChild = this.getElement();
     parent.replaceChild(newChild, prevElement);
-    newChild.scrollTop = currentScroll;
     this.restoreHandlers();
   }
 
