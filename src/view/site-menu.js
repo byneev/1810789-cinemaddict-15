@@ -14,7 +14,7 @@ const getSiteMenu = (filmsCountByFilters, currentFilter) => {
     <a href="#favorites" data-filter="isFavorite" class="main-navigation__item
     ${currentFilter === FilterType.FAVORITES ? 'main-navigation__item--active' : ''}">Favorites <span class="main-navigation__item-count">${isFavorite}</span></a>
   </div>
-  <a href="#stats" class="main-navigation__additional">Stats</a>
+  <a href="#stats" class="main-navigation__additional ${currentFilter === FilterType.NONE ? 'main-navigation__additional--active' : ''}">Stats</a>
 </nav>`;
 };
 
@@ -24,6 +24,17 @@ export default class SiteMenu extends AbstractElement {
     this._filters = filters;
     this._currentFilter = currentFilter;
     this._siteMenuItemClickHandler = this._siteMenuItemClickHandler.bind(this);
+    this._siteMenuStatsClickHandler = this._siteMenuStatsClickHandler.bind(this);
+  }
+
+  _siteMenuStatsClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.siteMenuStatsClick(evt);
+  }
+
+  setSiteMenuStatsClickHandler(callback) {
+    this._callback.siteMenuStatsClick = callback;
+    this.getElement().querySelector('.main-navigation__additional').addEventListener('click', this._siteMenuStatsClickHandler);
   }
 
   _siteMenuItemClickHandler(evt) {

@@ -12,6 +12,7 @@ import { getCountByFilters } from '../utils/common.js';
 import LoadingPageView from '../view/loading-page.js';
 import FilmsAmountView from '../view/films-amount.js';
 import Adapter from '../utils/adapter.js';
+import StatisticView from '../view/statistic.js';
 
 const MAX_FILMS_COUNT = 5;
 export default class MainPresenter {
@@ -32,6 +33,7 @@ export default class MainPresenter {
     this._filmsListComponent = new FilmsListView();
     this._filmListEmptyComponent = null;
     this._filmsAmountComponent = null;
+    this._statisticComponent = null;
     this._handleFilmViewAction = this._handleFilmViewAction.bind(this);
     this._closeAllPopups = this._closeAllPopups.bind(this);
     this._renderFilms = this._renderFilms.bind(this);
@@ -41,6 +43,7 @@ export default class MainPresenter {
     this._handleFilterModelEvent = this._handleFilterModelEvent.bind(this);
     this._handleSiteMenuViewAction = this._handleSiteMenuViewAction.bind(this);
     this._sortItemClickHandler = this._sortItemClickHandler.bind(this);
+    this._handleSiteMenuStatsClick = this._handleSiteMenuStatsClick.bind(this);
   }
 
   _getFilms() {
@@ -92,6 +95,7 @@ export default class MainPresenter {
 
   _sortItemClickHandler(evt) {
     const sortType = evt.target.dataset.sort;
+    console.log(sortType);
     if (sortType === this._currentSortType) {
       return;
     }
@@ -175,14 +179,30 @@ export default class MainPresenter {
     remove(this._sortViewComponent);
     remove(this._filmListEmptyComponent);
     remove(this._filmsAmountComponent);
+    if (this._statisticComponent) {
+      remove(this._statisticComponent);
+      this._currentSortType = SortType.DEFAULT;
+    }
     this._filmPresenters.forEach((filmPresenter) => remove(filmPresenter._filmCardComponent));
     this._filmPresenters.clear();
   }
 
-  _renderSiteMenu() {
-    this._siteMenuComponent = new SiteMenuView(this._filterModel.getFilters(), this._currentFilter);
+  _renderSiteMenu(filter) {
+    this._siteMenuComponent = new SiteMenuView(this._filterModel.getFilters(), filter);
     this._siteMenuComponent.setSiteMenuItemClickHandler(this._handleSiteMenuClick);
+    this._siteMenuComponent.setSiteMenuStatsClickHandler(this._handleSiteMenuStatsClick);
     render(this._mainContainer, this._siteMenuComponent, RenderPosition.BEFOREEND);
+  }
+
+  _renderStatistic() {
+    this._statisticComponent = new StatisticView(this._filmsModel.getFilms());
+    render(this._mainContainer, this._statisticComponent, RenderPosition.BEFOREEND);
+  }
+
+  _handleSiteMenuStatsClick() {
+    this._clearBoard();
+    this._renderSiteMenu(FilterType.NONE);
+    this._renderStatistic();
   }
 
   _renderProfile() {
@@ -199,7 +219,7 @@ export default class MainPresenter {
   _renderBoard() {
     const films = this._getFilms();
     this._renderProfile();
-    this._renderSiteMenu();
+    this._renderSiteMenu(this._currentFilter);
     this._renderSort();
     render(this._mainContainer, this._filmsListComponent, RenderPosition.BEFOREEND);
     this._filmsListContainer = this._filmsListComponent.getElement().querySelector('.films-list__container');

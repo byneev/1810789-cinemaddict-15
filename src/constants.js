@@ -44,6 +44,7 @@ export const FilterType = {
   WATCHLIST: 'isInWatchlist',
   HISTORY: 'isWatched',
   FAVORITES: 'isFavorite',
+  NONE: 'none',
 };
 
 export const SortType = {
@@ -74,4 +75,12 @@ export const DataType = {
 export const ActionType = {
   ADD: 'add',
   DELETE: 'delete',
+};
+
+export const TimeFilterType = {
+  ALL: 'all-time',
+  TODAY: 'today',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year',
 };
