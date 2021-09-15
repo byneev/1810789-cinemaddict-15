@@ -95,7 +95,6 @@ export default class MainPresenter {
 
   _sortItemClickHandler(evt) {
     const sortType = evt.target.dataset.sort;
-    console.log(sortType);
     if (sortType === this._currentSortType) {
       return;
     }
@@ -113,6 +112,7 @@ export default class MainPresenter {
     replace(newSiteMenu, this._siteMenuComponent);
     this._siteMenuComponent = newSiteMenu;
     this._siteMenuComponent.setSiteMenuItemClickHandler(this._handleSiteMenuClick);
+    this._siteMenuComponent.setSiteMenuStatsClickHandler(this._handleSiteMenuStatsClick);
   }
 
   _replaceProfile() {
@@ -179,10 +179,7 @@ export default class MainPresenter {
     remove(this._sortViewComponent);
     remove(this._filmListEmptyComponent);
     remove(this._filmsAmountComponent);
-    if (this._statisticComponent) {
-      remove(this._statisticComponent);
-      this._currentSortType = SortType.DEFAULT;
-    }
+    remove(this._statisticComponent);
     this._filmPresenters.forEach((filmPresenter) => remove(filmPresenter._filmCardComponent));
     this._filmPresenters.clear();
   }
@@ -195,14 +192,18 @@ export default class MainPresenter {
   }
 
   _renderStatistic() {
+    this._currentSortType = SortType.DEFAULT;
     this._statisticComponent = new StatisticView(this._filmsModel.getFilms());
+    this._statisticComponent.setStatsFilterClickHandler();
     render(this._mainContainer, this._statisticComponent, RenderPosition.BEFOREEND);
   }
 
   _handleSiteMenuStatsClick() {
     this._clearBoard();
+    this._renderProfile();
     this._renderSiteMenu(FilterType.NONE);
     this._renderStatistic();
+    this._statisticComponent.initStats();
   }
 
   _renderProfile() {
@@ -238,7 +239,7 @@ export default class MainPresenter {
       render(this._filmsListContainer, this._moreButtonComponent, RenderPosition.AFTER);
       this._moreButtonComponent.setClickHandler(this._moreButtonClickHandler);
     }
-    this._filmsAmountComponent = new FilmsAmountView(films);
+    this._filmsAmountComponent = new FilmsAmountView(this._filmsModel.getFilms());
     render(this._footerContainer, this._filmsAmountComponent, RenderPosition.BEFOREEND);
   }
 

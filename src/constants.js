@@ -4,6 +4,7 @@ export const ONE_SECOND_MILLISECONDS = 1000;
 export const SNAKE_ANIMATION_TIMEOUT = 600;
 export const NOVICE_FILM_COUNT = 10;
 export const FAN_FILM_COUNT = 20;
+export const BAR_HEIGHT = 50;
 
 export const POSTERS = ['made-for-each-other.png', 'popeye-meets-sinbad.png', 'sagebrush-trail.jpg', 'santa-claus-conquers-the-martians.jpg', 'the-dance-of-life.jpg', 'the-great-flamarion.jpg', 'the-man-with-the-golden-arm.jpg'];
 

@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { DataType, FilterType, UpdateType, ActionType } from '../constants.js';
 import Adapter from '../utils/adapter.js';
 import { remove, replace } from '../utils/common.js';
@@ -83,8 +84,8 @@ export default class FilmPresenter {
           .then((response) =>
             this._commentModel.setComments(
               response.comments.map((comment) => Adapter.serverToClientData(comment, DataType.COMMENT)),
-              UpdateType.MINOR,
-            ),
+              UpdateType.MINOR
+            )
           )
           .catch(() => {
             this._savedNewComment.snake(resetNewComment);
@@ -120,7 +121,7 @@ export default class FilmPresenter {
         UpdateType.MINOR,
         Object.assign({}, presenter._filmsModel.getFilmById(presenter._id), {
           commentsList: data,
-        }),
+        })
       );
     }
   }
@@ -203,7 +204,7 @@ export default class FilmPresenter {
         commentsList: this._commentModel.getComments().map((comment) => comment.id),
       }),
       FilterType.FAVORITES,
-      film.userDetails.isFavorite ? -1 : 1,
+      film.userDetails.isFavorite ? -1 : 1
     );
   }
 
@@ -222,7 +223,7 @@ export default class FilmPresenter {
         commentsList: this._commentModel.getComments().map((comment) => comment.id),
       }),
       FilterType.WATCHLIST,
-      film.userDetails.isInWatchlist ? -1 : 1,
+      film.userDetails.isInWatchlist ? -1 : 1
     );
   }
 
@@ -236,12 +237,12 @@ export default class FilmPresenter {
           isWatched: !film.userDetails.isWatched,
           isFavorite: film.userDetails.isFavorite,
           isInWatchlist: film.userDetails.isInWatchlist,
-          watchingDate: film.userDetails.watchingDate,
+          watchingDate: dayjs().toDate(),
         },
         commentsList: this._commentModel.getComments().map((comment) => comment.id),
       }),
       FilterType.HISTORY,
-      film.userDetails.isWatched ? -1 : 1,
+      film.userDetails.isWatched ? -1 : 1
     );
   }
 
