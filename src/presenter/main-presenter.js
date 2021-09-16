@@ -209,6 +209,7 @@ export default class MainPresenter {
     this._renderSiteMenu(FilterType.NONE);
     this._renderStatistic();
     this._statisticComponent.initStats();
+    this._renderFooter();
   }
 
   _renderProfile() {
@@ -222,6 +223,12 @@ export default class MainPresenter {
     render(this._mainContainer, this._sortViewComponent, RenderPosition.BEFOREEND);
   }
 
+  _renderFooter() {
+    this._footerContainer = document.querySelector('.footer__statistics');
+    this._filmsAmountComponent = new FilmsAmountView(this._totalFilmsCount);
+    render(this._footerContainer, this._filmsAmountComponent, RenderPosition.BEFOREEND);
+  }
+
   _renderBoard() {
     const films = this._getFilms();
     this._renderProfile();
@@ -229,13 +236,11 @@ export default class MainPresenter {
     this._renderSort();
     render(this._mainContainer, this._filmsListComponent, RenderPosition.BEFOREEND);
     this._filmsListContainer = this._filmsListComponent.getElement().querySelector('.films-list__container');
-    this._footerContainer = document.querySelector('.footer__statistics');
     if (films.length === 0) {
       const siteMenuActiveItemHref = this._siteMenuComponent.getElement().querySelector('.main-navigation__item--active').getAttribute('href');
       this._filmListEmptyComponent = new FilmListEmptyView(siteMenuActiveItemHref);
       render(this._filmsListContainer, this._filmListEmptyComponent, RenderPosition.BEFOREEND);
-      this._filmsAmountComponent = new FilmsAmountView(this._totalFilmsCount);
-      render(this._footerContainer, this._filmsAmountComponent, RenderPosition.BEFOREEND);
+      this._renderFooter();
       return;
     }
     this._renderFilms(films.slice(0, Math.min(films.length, this._renderedFilmsCount)));
@@ -244,8 +249,7 @@ export default class MainPresenter {
       render(this._filmsListContainer, this._moreButtonComponent, RenderPosition.AFTER);
       this._moreButtonComponent.setClickHandler(this._moreButtonClickHandler);
     }
-    this._filmsAmountComponent = new FilmsAmountView(this._totalFilmsCount);
-    render(this._footerContainer, this._filmsAmountComponent, RenderPosition.BEFOREEND);
+    this._renderFooter();
   }
 
   _moreButtonClickHandler() {
