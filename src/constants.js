@@ -76,6 +76,7 @@ export const DataType = {
 export const ActionType = {
   ADD: 'add',
   DELETE: 'delete',
+  PATCH: 'patch',
 };
 
 export const TimeFilterType = {

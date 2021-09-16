@@ -34,16 +34,18 @@ export default class FilmPresenter {
     this._handleCommentModelEvent = this._handleCommentModelEvent.bind(this);
     this._commentDeleteHandler = this._commentDeleteHandler.bind(this);
     this._newCommentKeydownHandler = this._newCommentKeydownHandler.bind(this);
+    this.removeListeners = this.removeListeners.bind(this);
+    this.setListeners = this.setListeners.bind(this);
+    this._renderPopup = this._renderPopup.bind(this);
+    this._renderCommentsBlock = this._renderCommentsBlock.bind(this);
+    this._clearCommentsBlock = this._clearCommentsBlock.bind(this);
   }
 
   init(filmData) {
     this._id = filmData.id;
     const oldFilmCard = this._filmCardComponent;
     this._filmCardComponent = new FilmCardView(filmData);
-    this._filmCardComponent.setClickHandler(this._clickHandler);
-    this._filmCardComponent.setFavoriteClickHandler(this._clickFavoriteHandler);
-    this._filmCardComponent.setWatchlistClickHandler(this._clickWatchlistHandler);
-    this._filmCardComponent.setWatchedClickHandler(this._clickWatchedHandler);
+    this.setListeners();
 
     if (oldFilmCard === null) {
       render(this._container, this._filmCardComponent, RenderPosition.BEFOREEND);
@@ -51,6 +53,17 @@ export default class FilmPresenter {
     }
     replace(this._filmCardComponent, oldFilmCard);
     remove(oldFilmCard);
+  }
+
+  removeListeners() {
+    this._filmCardComponent.removeListeners();
+  }
+
+  setListeners() {
+    this._filmCardComponent.setClickHandler(this._clickHandler);
+    this._filmCardComponent.setFavoriteClickHandler(this._clickFavoriteHandler);
+    this._filmCardComponent.setWatchlistClickHandler(this._clickWatchlistHandler);
+    this._filmCardComponent.setWatchedClickHandler(this._clickWatchedHandler);
   }
 
   _onEscapeKeydown(evt) {
@@ -84,7 +97,7 @@ export default class FilmPresenter {
           .then((response) =>
             this._commentModel.setComments(
               response.comments.map((comment) => Adapter.serverToClientData(comment, DataType.COMMENT)),
-              UpdateType.MINOR
+              ActionType.ADD
             )
           )
           .catch(() => {
@@ -96,7 +109,7 @@ export default class FilmPresenter {
         this._api
           .deleteComment(update)
           .then(() => {
-            this._commentModel.deleteComment(update, UpdateType.MINOR);
+            this._commentModel.deleteComment(update, ActionType.DELETE);
           })
           .catch(() => {
             this._commentsMap.get(update).snake(resetComment);
@@ -109,14 +122,13 @@ export default class FilmPresenter {
     this._handleCommentAction(ActionType.DELETE, evt.target.dataset.id);
   }
 
-  _handleCommentModelEvent(data, updateType) {
+  _handleCommentModelEvent(data, actionType) {
     const presenter = this._commentModel.getPresenter();
+    this._lastAction = actionType;
     presenter._clearCommentsBlock();
     presenter._renderCommentsBlock(data);
-    if (presenter._savedNewComment !== null) {
-      presenter._newCommentComponent.updateData(presenter._savedNewComment.getData());
-    }
-    if (updateType === UpdateType.MINOR) {
+    presenter._setScrollPopup();
+    if (actionType === ActionType.DELETE || actionType === ActionType.ADD) {
       presenter._filmsModel.updateFilm(
         UpdateType.MINOR,
         Object.assign({}, presenter._filmsModel.getFilmById(presenter._id), {
@@ -151,6 +163,9 @@ export default class FilmPresenter {
       render(this.commentsContainer, commentComponent, RenderPosition.BEFOREEND);
     });
     this._newCommentComponent = new NewCommentView();
+    if (this._savedNewComment !== null && this._lastAction === ActionType.DELETE) {
+      this._newCommentComponent = this._savedNewComment;
+    }
     render(this.commentsContainer, this._newCommentComponent, RenderPosition.AFTER);
     this._newCommentComponent.setAddCommentKeydownHandler(this._newCommentKeydownHandler);
     document.body.addEventListener('keydown', this._onEscapeKeydown);
@@ -167,6 +182,7 @@ export default class FilmPresenter {
     this._filmDetailsComponent.setFavoriteClickHandler(this._clickFavoriteHandler);
     this._filmDetailsComponent.setInWatchlistClickHandler(this._clickWatchlistHandler);
     this._filmDetailsComponent.setWatchedClickHandler(this._clickWatchedHandler);
+    this._filmDetailsComponent.setChangeScrollHandler();
     document.body.addEventListener('keydown', this._onEscapeKeydown);
     document.body.classList.add('hide-overflow');
     render(document.body, this._filmDetailsComponent, RenderPosition.BEFOREEND);
@@ -174,8 +190,6 @@ export default class FilmPresenter {
       this._commentModel.setPresenter(this);
       this._commentModel.setComments(comments);
     });
-
-    this._previousId = this._id;
   }
 
   _closePopup() {
@@ -246,7 +260,7 @@ export default class FilmPresenter {
     );
   }
 
-  _setScrollPopup(scrollTop) {
-    this._filmDetailsComponent.getElement().scrollTop = scrollTop;
+  _setScrollPopup() {
+    this._filmDetailsComponent.getElement().scrollTop = this._filmDetailsComponent.scroll;
   }
 }

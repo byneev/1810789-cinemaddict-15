@@ -20,17 +20,15 @@ const getActualGenres = (films) => {
 const getGenresCountMap = (films) => {
   const genresSet = getActualGenres(films);
   const genresCountMap = new Map();
-  let count;
   genresSet.forEach((genre) => {
-    count = 0;
+    let count = 0;
     films.forEach((film) => {
       if (film.genres.includes(genre)) {
         count++;
       }
     });
-    genresCountMap.set(count, genre);
+    genresCountMap.set(genre, count);
   });
-  console.log(genresCountMap);
   return genresCountMap;
 };
 
@@ -69,7 +67,7 @@ const getStatistic = (data) => {
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Total duration</h4>
-      <p class="statistic__item-text">${filmsTime[0]}<span class="statistic__item-description">h</span> ${filmsTime[1]} <span class="statistic__item-description">m</span></p>
+      <p class="statistic__item-text">${filmsTime[0] === '' ? filmsTime[0] : '<span class="statistic__item-description">h</span>'} ${filmsTime[1] === '' ? filmsTime[1] : '<span class="statistic__item-description">m</span>'}</p>
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Top genre</h4>
@@ -135,8 +133,8 @@ export default class Statistic extends Smart {
       genres: null,
       currentFilter: filter,
       filmsCount: 0,
-      filmsTime: [0, 0],
-      topGenre: 'none',
+      filmsTime: ['', ''],
+      topGenre: '',
       profile: '',
     };
   }
@@ -150,10 +148,17 @@ export default class Statistic extends Smart {
     let result = 0;
     this._watchedFilms.forEach((film) => (result += film.runtime));
     const genresMap = getGenresCountMap(films);
-    const topGenre = genresMap.get([...genresMap.keys()].sort()[[...genresMap.keys()].length - 1]);
+    let previousMax = 0;
+    let topGenre;
+    for (const [key, value] of genresMap.entries()) {
+      if (value >= previousMax) {
+        topGenre = key;
+        previousMax = value;
+      }
+    }
     return {
       genresMap: genresMap,
-      genres: genresMap.values(),
+      genres: genresMap.keys(),
       currentFilter: filter,
       filmsCount: this._watchedFilms.length,
       filmsTime: [Math.floor(result / 60), result % 60],
@@ -173,10 +178,10 @@ export default class Statistic extends Smart {
       plugins: [chartDataLabels],
       type: 'horizontalBar',
       data: {
-        labels: [...this._data.genresMap.values()],
+        labels: [...this._data.genresMap.keys()],
         datasets: [
           {
-            data: [...this._data.genresMap.keys()],
+            data: [...this._data.genresMap.values()],
             backgroundColor: '#ffe800',
             hoverBackgroundColor: '#ffe800',
             anchor: 'start',
