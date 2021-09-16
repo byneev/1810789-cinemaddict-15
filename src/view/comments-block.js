@@ -16,7 +16,7 @@ export default class CommentsBlock extends AbstractElement {
     this._commentsCount = commentsCount;
   }
 
-  getTemplate() {
+  _getTemplate() {
     return getCommentsBlock(this._commentsCount);
   }
 }

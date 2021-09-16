@@ -92,7 +92,7 @@ export default class Adapter {
             isFavorite: data.user_details.favorite,
             isWatched: data.user_details.already_watched,
             isInWatchlist: data.user_details.watchlist,
-            watchingDate: new Date(data.user_details.watching_date),
+            watchingDate: data.user_details.watching_date ? new Date(data.user_details.watching_date) : null,
           },
           writers: data.film_info.writers,
         });

@@ -43,7 +43,7 @@ const getCountByFilters = (films) => ({
 const sortByType = (films, sortType) => {
   switch (sortType) {
     case SortType.DATE:
-      return films.slice().sort((filmA, filmB) => filmA.realiseDate - filmB.realiseDate);
+      return films.slice().sort((filmA, filmB) => filmB.realiseDate - filmA.realiseDate);
     case SortType.RATING:
       return films.slice().sort((filmA, filmB) => filmB.rating - filmA.rating);
     case SortType.DEFAULT:

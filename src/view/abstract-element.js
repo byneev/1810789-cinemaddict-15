@@ -10,13 +10,13 @@ export default class AbstractElement {
     this._callback = {};
   }
 
-  getTemplate() {
+  _getTemplate() {
     throw new Error('getTemplate function should be implemented');
   }
 
   getElement() {
     if (!this._element) {
-      this._element = createElement(this.getTemplate());
+      this._element = createElement(this._getTemplate());
     }
     return this._element;
   }

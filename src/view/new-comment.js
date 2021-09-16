@@ -8,7 +8,8 @@ const getNewComment = (data) => {
     (item) => `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${item}" value="${item}" ${item === data.emoji ? 'checked' : ''} ${data.isAdding ? 'disabled' : ''}>
       <label class="film-details__emoji-label" for="emoji-${item}">
         <img src="./images/emoji/${item}.png" width="30" height="30" alt="emoji">
-      </label>`).join('');
+      </label>`,
+  ).join('');
   const newComment = `<div class="film-details__new-comment"><div class="film-details__add-emoji-label">
     ${!data.emoji ? '' : currentEmoji}
     </div>
@@ -33,6 +34,7 @@ export default class NewComment extends Smart {
     };
     this._clickEmojiHandler = this._clickEmojiHandler.bind(this);
     this._addCommentKeydownHandler = this._addCommentKeydownHandler.bind(this);
+    this.updateData = this.updateData.bind(this);
     this._setInnerHandlers();
   }
 
@@ -47,10 +49,12 @@ export default class NewComment extends Smart {
 
   _clickEmojiHandler(evt) {
     evt.preventDefault();
+    if (evt.target.tagName !== 'IMG') {
+      return;
+    }
     this.updateData({
       emoji: evt.target.parentNode.getAttribute('for').split('-')[1],
     });
-    this.restoreHandlers();
   }
 
   _addCommentKeydownHandler(evt) {
@@ -72,12 +76,12 @@ export default class NewComment extends Smart {
       });
   }
 
-  restoreHandlers() {
+  _restoreHandlers() {
     this._setInnerHandlers();
     this.getElement().querySelector('.film-details__comment-input').addEventListener('keydown', this._addCommentKeydownHandler);
   }
 
-  getTemplate() {
+  _getTemplate() {
     return getNewComment(this._data);
   }
 }

@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { DataType, FilterType, UpdateType, ActionType } from '../constants.js';
 import Adapter from '../utils/adapter.js';
 import { remove, replace } from '../utils/common.js';
@@ -15,7 +16,7 @@ export default class FilmPresenter {
     this._filmsModel = filmsModel;
     this._commentModel = commentModel;
     this._container = container;
-    this.changeData = changeData;
+    this._changeData = changeData;
     this._api = api;
     this._commentsMap = new Map();
     this._filmCardComponent = null;
@@ -27,22 +28,24 @@ export default class FilmPresenter {
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
     this._clickWatchlistHandler = this._clickWatchlistHandler.bind(this);
     this._clickWatchedHandler = this._clickWatchedHandler.bind(this);
-    this._closePopup = this._closePopup.bind(this);
+    this.closePopup = this.closePopup.bind(this);
     this._onEscapeKeydown = this._onEscapeKeydown.bind(this);
     this._handleCommentAction = this._handleCommentAction.bind(this);
     this._handleCommentModelEvent = this._handleCommentModelEvent.bind(this);
     this._commentDeleteHandler = this._commentDeleteHandler.bind(this);
     this._newCommentKeydownHandler = this._newCommentKeydownHandler.bind(this);
+    this.removeListeners = this.removeListeners.bind(this);
+    this.setListeners = this.setListeners.bind(this);
+    this._renderPopup = this._renderPopup.bind(this);
+    this._renderCommentsBlock = this._renderCommentsBlock.bind(this);
+    this._clearCommentsBlock = this._clearCommentsBlock.bind(this);
   }
 
   init(filmData) {
     this._id = filmData.id;
     const oldFilmCard = this._filmCardComponent;
     this._filmCardComponent = new FilmCardView(filmData);
-    this._filmCardComponent.setClickHandler(this._clickHandler);
-    this._filmCardComponent.setFavoriteClickHandler(this._clickFavoriteHandler);
-    this._filmCardComponent.setWatchlistClickHandler(this._clickWatchlistHandler);
-    this._filmCardComponent.setWatchedClickHandler(this._clickWatchedHandler);
+    this.setListeners();
 
     if (oldFilmCard === null) {
       render(this._container, this._filmCardComponent, RenderPosition.BEFOREEND);
@@ -52,13 +55,24 @@ export default class FilmPresenter {
     remove(oldFilmCard);
   }
 
+  removeListeners() {
+    this._filmCardComponent.removeListeners();
+  }
+
+  setListeners() {
+    this._filmCardComponent.setClickHandler(this._clickHandler);
+    this._filmCardComponent.setFavoriteClickHandler(this._clickFavoriteHandler);
+    this._filmCardComponent.setWatchlistClickHandler(this._clickWatchlistHandler);
+    this._filmCardComponent.setWatchedClickHandler(this._clickWatchedHandler);
+  }
+
   _onEscapeKeydown(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
-      this._closePopup();
+      this.closePopup();
     }
   }
 
-  resetElement(element) {
+  _resetElement(element) {
     return () =>
       element.updateData({
         isDisabling: false,
@@ -66,8 +80,8 @@ export default class FilmPresenter {
   }
 
   _handleCommentAction(actionType, update = {}) {
-    const resetComment = this.resetElement(this._commentsMap.get(update));
-    const resetNewComment = this.resetElement(this._savedNewComment);
+    const resetComment = this._resetElement(this._commentsMap.get(update));
+    const resetNewComment = this._resetElement(this._savedNewComment);
 
     switch (actionType) {
       case ActionType.ADD:
@@ -83,7 +97,7 @@ export default class FilmPresenter {
           .then((response) =>
             this._commentModel.setComments(
               response.comments.map((comment) => Adapter.serverToClientData(comment, DataType.COMMENT)),
-              UpdateType.MINOR,
+              ActionType.ADD,
             ),
           )
           .catch(() => {
@@ -95,7 +109,7 @@ export default class FilmPresenter {
         this._api
           .deleteComment(update)
           .then(() => {
-            this._commentModel.deleteComment(update, UpdateType.MINOR);
+            this._commentModel.deleteComment(update, ActionType.DELETE);
           })
           .catch(() => {
             this._commentsMap.get(update).snake(resetComment);
@@ -108,14 +122,13 @@ export default class FilmPresenter {
     this._handleCommentAction(ActionType.DELETE, evt.target.dataset.id);
   }
 
-  _handleCommentModelEvent(data, updateType) {
+  _handleCommentModelEvent(data, actionType) {
     const presenter = this._commentModel.getPresenter();
+    this._lastAction = actionType;
     presenter._clearCommentsBlock();
     presenter._renderCommentsBlock(data);
-    if (presenter._savedNewComment !== null) {
-      presenter._newCommentComponent.updateData(presenter._savedNewComment.getData());
-    }
-    if (updateType === UpdateType.MINOR) {
+    presenter.setScrollPopup();
+    if (actionType === ActionType.DELETE || actionType === ActionType.ADD) {
       presenter._filmsModel.updateFilm(
         UpdateType.MINOR,
         Object.assign({}, presenter._filmsModel.getFilmById(presenter._id), {
@@ -130,7 +143,7 @@ export default class FilmPresenter {
       this._handleCommentAction(ActionType.ADD);
     }
     if (evt.key === 'Escape') {
-      this._closePopup();
+      this.closePopup();
     }
   }
 
@@ -150,6 +163,9 @@ export default class FilmPresenter {
       render(this.commentsContainer, commentComponent, RenderPosition.BEFOREEND);
     });
     this._newCommentComponent = new NewCommentView();
+    if (this._savedNewComment !== null && this._lastAction === ActionType.DELETE) {
+      this._newCommentComponent = this._savedNewComment;
+    }
     render(this.commentsContainer, this._newCommentComponent, RenderPosition.AFTER);
     this._newCommentComponent.setAddCommentKeydownHandler(this._newCommentKeydownHandler);
     document.body.addEventListener('keydown', this._onEscapeKeydown);
@@ -162,10 +178,11 @@ export default class FilmPresenter {
     this._id = id;
     this.isOpen = true;
     this._filmDetailsComponent = new FilmDetailsView(film);
-    this._filmDetailsComponent.setCloseButtonClickHandler(this._closePopup);
+    this._filmDetailsComponent.setCloseButtonClickHandler(this.closePopup);
     this._filmDetailsComponent.setFavoriteClickHandler(this._clickFavoriteHandler);
     this._filmDetailsComponent.setInWatchlistClickHandler(this._clickWatchlistHandler);
     this._filmDetailsComponent.setWatchedClickHandler(this._clickWatchedHandler);
+    this._filmDetailsComponent.setChangeScrollHandler();
     document.body.addEventListener('keydown', this._onEscapeKeydown);
     document.body.classList.add('hide-overflow');
     render(document.body, this._filmDetailsComponent, RenderPosition.BEFOREEND);
@@ -173,11 +190,9 @@ export default class FilmPresenter {
       this._commentModel.setPresenter(this);
       this._commentModel.setComments(comments);
     });
-
-    this._previousId = this._id;
   }
 
-  _closePopup() {
+  closePopup() {
     this.isOpen = false;
     remove(this._filmDetailsComponent);
     this._commentModel.removeObserver(this._handleCommentModelEvent);
@@ -191,7 +206,7 @@ export default class FilmPresenter {
   _clickFavoriteHandler() {
     const film = this._filmsModel.getFilmById(this._id);
     const updateType = this._filterModel.getCurrentFilterType() === FilterType.FAVORITES ? UpdateType.MAJOR : UpdateType.MINOR;
-    this.changeData(
+    this._changeData(
       updateType,
       Object.assign({}, film, {
         userDetails: {
@@ -210,7 +225,7 @@ export default class FilmPresenter {
   _clickWatchlistHandler() {
     const film = this._filmsModel.getFilmById(this._id);
     const updateType = this._filterModel.getCurrentFilterType() === FilterType.WATCHLIST ? UpdateType.MAJOR : UpdateType.MINOR;
-    this.changeData(
+    this._changeData(
       updateType,
       Object.assign({}, film, {
         userDetails: {
@@ -229,14 +244,14 @@ export default class FilmPresenter {
   _clickWatchedHandler() {
     const film = this._filmsModel.getFilmById(this._id);
     const updateType = this._filterModel.getCurrentFilterType() === FilterType.HISTORY ? UpdateType.MAJOR : UpdateType.MINOR;
-    this.changeData(
+    this._changeData(
       updateType,
       Object.assign({}, film, {
         userDetails: {
           isWatched: !film.userDetails.isWatched,
           isFavorite: film.userDetails.isFavorite,
           isInWatchlist: film.userDetails.isInWatchlist,
-          watchingDate: film.userDetails.watchingDate,
+          watchingDate: dayjs().toDate(),
         },
         commentsList: this._commentModel.getComments().map((comment) => comment.id),
       }),
@@ -245,7 +260,7 @@ export default class FilmPresenter {
     );
   }
 
-  _setScrollPopup(scrollTop) {
-    this._filmDetailsComponent.getElement().scrollTop = scrollTop;
+  setScrollPopup() {
+    this._filmDetailsComponent.getElement().scrollTop = this._filmDetailsComponent.scroll;
   }
 }

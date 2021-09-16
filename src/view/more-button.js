@@ -18,7 +18,7 @@ export default class MoreButton extends AbstractElement {
     this.getElement().addEventListener('click', this._clickHandler);
   }
 
-  getTemplate() {
+  _getTemplate() {
     return getMoreButton();
   }
 }
