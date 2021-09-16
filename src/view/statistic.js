@@ -34,6 +34,7 @@ const getGenresCountMap = (films) => {
 
 const getStatistic = (data) => {
   const { currentFilter, filmsCount, filmsTime, topGenre, profile } = data;
+  const toalFilmsTime = filmsTime[0] !== '' ? `${filmsTime[0]}<span class="statistic__item-description">h</span> ${filmsTime[1]}<span class="statistic__item-description">m</span>` : '';
   return `<section class="statistic">
   <p class="statistic__rank">
     Your rank
@@ -67,7 +68,7 @@ const getStatistic = (data) => {
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Total duration</h4>
-      <p class="statistic__item-text">${filmsTime[0] === '' ? filmsTime[0] : '<span class="statistic__item-description">h</span>'} ${filmsTime[1] === '' ? filmsTime[1] : '<span class="statistic__item-description">m</span>'}</p>
+      <p class="statistic__item-text">${toalFilmsTime}</p>
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Top genre</h4>
