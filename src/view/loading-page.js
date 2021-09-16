@@ -18,7 +18,7 @@ const getLoadingPage = () => `<div>
 </div>`;
 
 export default class LoadingPage extends AbstractElement {
-  getTemplate() {
+  _getTemplate() {
     return getLoadingPage();
   }
 }

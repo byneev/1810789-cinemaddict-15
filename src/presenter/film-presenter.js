@@ -16,7 +16,7 @@ export default class FilmPresenter {
     this._filmsModel = filmsModel;
     this._commentModel = commentModel;
     this._container = container;
-    this.changeData = changeData;
+    this._changeData = changeData;
     this._api = api;
     this._commentsMap = new Map();
     this._filmCardComponent = null;
@@ -28,7 +28,7 @@ export default class FilmPresenter {
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
     this._clickWatchlistHandler = this._clickWatchlistHandler.bind(this);
     this._clickWatchedHandler = this._clickWatchedHandler.bind(this);
-    this._closePopup = this._closePopup.bind(this);
+    this.closePopup = this.closePopup.bind(this);
     this._onEscapeKeydown = this._onEscapeKeydown.bind(this);
     this._handleCommentAction = this._handleCommentAction.bind(this);
     this._handleCommentModelEvent = this._handleCommentModelEvent.bind(this);
@@ -68,11 +68,11 @@ export default class FilmPresenter {
 
   _onEscapeKeydown(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
-      this._closePopup();
+      this.closePopup();
     }
   }
 
-  resetElement(element) {
+  _resetElement(element) {
     return () =>
       element.updateData({
         isDisabling: false,
@@ -80,8 +80,8 @@ export default class FilmPresenter {
   }
 
   _handleCommentAction(actionType, update = {}) {
-    const resetComment = this.resetElement(this._commentsMap.get(update));
-    const resetNewComment = this.resetElement(this._savedNewComment);
+    const resetComment = this._resetElement(this._commentsMap.get(update));
+    const resetNewComment = this._resetElement(this._savedNewComment);
 
     switch (actionType) {
       case ActionType.ADD:
@@ -97,8 +97,8 @@ export default class FilmPresenter {
           .then((response) =>
             this._commentModel.setComments(
               response.comments.map((comment) => Adapter.serverToClientData(comment, DataType.COMMENT)),
-              ActionType.ADD
-            )
+              ActionType.ADD,
+            ),
           )
           .catch(() => {
             this._savedNewComment.snake(resetNewComment);
@@ -127,13 +127,13 @@ export default class FilmPresenter {
     this._lastAction = actionType;
     presenter._clearCommentsBlock();
     presenter._renderCommentsBlock(data);
-    presenter._setScrollPopup();
+    presenter.setScrollPopup();
     if (actionType === ActionType.DELETE || actionType === ActionType.ADD) {
       presenter._filmsModel.updateFilm(
         UpdateType.MINOR,
         Object.assign({}, presenter._filmsModel.getFilmById(presenter._id), {
           commentsList: data,
-        })
+        }),
       );
     }
   }
@@ -143,7 +143,7 @@ export default class FilmPresenter {
       this._handleCommentAction(ActionType.ADD);
     }
     if (evt.key === 'Escape') {
-      this._closePopup();
+      this.closePopup();
     }
   }
 
@@ -178,7 +178,7 @@ export default class FilmPresenter {
     this._id = id;
     this.isOpen = true;
     this._filmDetailsComponent = new FilmDetailsView(film);
-    this._filmDetailsComponent.setCloseButtonClickHandler(this._closePopup);
+    this._filmDetailsComponent.setCloseButtonClickHandler(this.closePopup);
     this._filmDetailsComponent.setFavoriteClickHandler(this._clickFavoriteHandler);
     this._filmDetailsComponent.setInWatchlistClickHandler(this._clickWatchlistHandler);
     this._filmDetailsComponent.setWatchedClickHandler(this._clickWatchedHandler);
@@ -192,7 +192,7 @@ export default class FilmPresenter {
     });
   }
 
-  _closePopup() {
+  closePopup() {
     this.isOpen = false;
     remove(this._filmDetailsComponent);
     this._commentModel.removeObserver(this._handleCommentModelEvent);
@@ -206,7 +206,7 @@ export default class FilmPresenter {
   _clickFavoriteHandler() {
     const film = this._filmsModel.getFilmById(this._id);
     const updateType = this._filterModel.getCurrentFilterType() === FilterType.FAVORITES ? UpdateType.MAJOR : UpdateType.MINOR;
-    this.changeData(
+    this._changeData(
       updateType,
       Object.assign({}, film, {
         userDetails: {
@@ -218,14 +218,14 @@ export default class FilmPresenter {
         commentsList: this._commentModel.getComments().map((comment) => comment.id),
       }),
       FilterType.FAVORITES,
-      film.userDetails.isFavorite ? -1 : 1
+      film.userDetails.isFavorite ? -1 : 1,
     );
   }
 
   _clickWatchlistHandler() {
     const film = this._filmsModel.getFilmById(this._id);
     const updateType = this._filterModel.getCurrentFilterType() === FilterType.WATCHLIST ? UpdateType.MAJOR : UpdateType.MINOR;
-    this.changeData(
+    this._changeData(
       updateType,
       Object.assign({}, film, {
         userDetails: {
@@ -237,14 +237,14 @@ export default class FilmPresenter {
         commentsList: this._commentModel.getComments().map((comment) => comment.id),
       }),
       FilterType.WATCHLIST,
-      film.userDetails.isInWatchlist ? -1 : 1
+      film.userDetails.isInWatchlist ? -1 : 1,
     );
   }
 
   _clickWatchedHandler() {
     const film = this._filmsModel.getFilmById(this._id);
     const updateType = this._filterModel.getCurrentFilterType() === FilterType.HISTORY ? UpdateType.MAJOR : UpdateType.MINOR;
-    this.changeData(
+    this._changeData(
       updateType,
       Object.assign({}, film, {
         userDetails: {
@@ -256,11 +256,11 @@ export default class FilmPresenter {
         commentsList: this._commentModel.getComments().map((comment) => comment.id),
       }),
       FilterType.HISTORY,
-      film.userDetails.isWatched ? -1 : 1
+      film.userDetails.isWatched ? -1 : 1,
     );
   }
 
-  _setScrollPopup() {
+  setScrollPopup() {
     this._filmDetailsComponent.getElement().scrollTop = this._filmDetailsComponent.scroll;
   }
 }

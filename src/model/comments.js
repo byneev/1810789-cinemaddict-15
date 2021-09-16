@@ -1,4 +1,4 @@
-import { ActionType, UpdateType } from '../constants.js';
+import { ActionType } from '../constants.js';
 import AbstractObserver from '../utils/abstract-observer.js';
 
 export default class Comments extends AbstractObserver {
@@ -7,7 +7,7 @@ export default class Comments extends AbstractObserver {
     this._comments = [];
   }
 
-  getObserverCount() {
+  getObserversCount() {
     return this._observers.size;
   }
 

@@ -31,7 +31,7 @@ export default class Profile extends AbstractElement {
     this._filters = filters;
   }
 
-  getTemplate() {
+  _getTemplate() {
     return getProfile(this._filters);
   }
 }

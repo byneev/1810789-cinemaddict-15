@@ -78,7 +78,7 @@ export default class FilmDetails extends Smart {
   constructor(film) {
     super();
     this._film = film;
-    this._data = this._filmToData(film);
+    this._data = this._convertFilmToData(film);
     this._clickCloseButtonHandler = this._clickCloseButtonHandler.bind(this);
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
     this._clickInWatchlistHandler = this._clickInWatchlistHandler.bind(this);
@@ -86,7 +86,7 @@ export default class FilmDetails extends Smart {
     this._changeScrollHandler = this._changeScrollHandler.bind(this);
   }
 
-  _filmToData() {
+  _convertFilmToData() {
     return Object.assign({}, this._film, {
       isFavorite: this._film.userDetails.isFavorite,
       isWatched: this._film.userDetails.isWatched,
@@ -94,7 +94,7 @@ export default class FilmDetails extends Smart {
     });
   }
 
-  restoreHandlers() {
+  _restoreHandlers() {
     this.getElement().querySelector('.film-details__control-button--favorite').addEventListener('click', this._clickFavoriteHandler);
     this.getElement().querySelector('.film-details__control-button--watched').addEventListener('click', this._clickWatchedHandler);
     this.getElement().querySelector('.film-details__control-button--watchlist').addEventListener('click', this._clickInWatchlistHandler);
@@ -156,14 +156,13 @@ export default class FilmDetails extends Smart {
   _changeScrollHandler(evt) {
     evt.preventDefault();
     this.scroll = this.getElement().scrollTop;
-    console.log(this.scroll);
   }
 
   setChangeScrollHandler() {
     this.getElement().addEventListener('scroll', this._changeScrollHandler);
   }
 
-  getTemplate() {
+  _getTemplate() {
     return getFilmDetails(this._data);
   }
 }

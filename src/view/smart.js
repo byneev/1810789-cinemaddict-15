@@ -6,18 +6,17 @@ export default class Smart extends AbstractElement {
     this._data = {};
   }
 
-  restoreHandlers() {
+  _restoreHandlers() {
     throw new Error('restoreHandlers should be implement');
   }
 
-  updateElement() {
+  _updateElement() {
     const prevElement = this.getElement();
-    // this.scrollTop = prevElement.scrollTop;
     const parent = prevElement.parentNode;
     this.removeElement();
     const newChild = this.getElement();
     parent.replaceChild(newChild, prevElement);
-    this.restoreHandlers();
+    this._restoreHandlers();
   }
 
   updateData(update, justUpdateData) {
@@ -28,6 +27,6 @@ export default class Smart extends AbstractElement {
     if (justUpdateData) {
       return;
     }
-    this.updateElement();
+    this._updateElement();
   }
 }

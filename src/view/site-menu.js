@@ -47,7 +47,7 @@ export default class SiteMenu extends AbstractElement {
     [...this.getElement().querySelectorAll('.main-navigation__item')].forEach((item) => item.addEventListener('click', this._siteMenuItemClickHandler));
   }
 
-  getTemplate() {
+  _getTemplate() {
     return getSiteMenu(this._filters, this._currentFilter);
   }
 }

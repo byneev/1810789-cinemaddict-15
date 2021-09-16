@@ -24,7 +24,7 @@ export default class Sort extends AbstractElement {
     [...this.getElement().querySelectorAll('.sort__button')].forEach((item) => item.addEventListener('click', this._sortItemClickHandler));
   }
 
-  getTemplate() {
+  _getTemplate() {
     return getSort(this._currentSortType);
   }
 }

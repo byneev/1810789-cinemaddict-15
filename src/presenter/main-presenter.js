@@ -1,4 +1,4 @@
-import { DataType, FilterType, SortType, UpdateType } from '../constants.js';
+import { DataType, FilterType, SortType, UpdateType, MAX_FILMS_COUNT } from '../constants.js';
 import { remove, replace, sortByType } from '../utils/common.js';
 import { render, RenderPosition } from '../utils/render.js';
 import FilmListEmptyView from '../view/films-list-empty.js';
@@ -14,7 +14,6 @@ import FilmsAmountView from '../view/films-amount.js';
 import Adapter from '../utils/adapter.js';
 import StatisticView from '../view/statistic.js';
 
-const MAX_FILMS_COUNT = 5;
 export default class MainPresenter {
   constructor(mainContainer, headerContainer, filmsModel, filterModel, commentModel, api) {
     this._totalFilmsCount = 0;
@@ -134,7 +133,7 @@ export default class MainPresenter {
         if (currentFilmPresenter.isOpen) {
           currentFilmPresenter._clearCommentsBlock();
           currentFilmPresenter._renderCommentsBlock(this._commentModel.getComments());
-          currentFilmPresenter._setScrollPopup();
+          currentFilmPresenter.setScrollPopup();
         }
         this._currentFilter = this._filterModel.getCurrentFilterType();
         this._replaceSiteMenu();
@@ -149,7 +148,6 @@ export default class MainPresenter {
         break;
       case UpdateType.INIT:
         this._totalFilmsCount = this._filmsModel.getFilms().length;
-        console.log(this._totalFilmsCount);
         remove(this._loadingComponent);
         this._filterModel.setFilters(getCountByFilters(this._getFilms()));
         this._clearBoard();
@@ -161,7 +159,7 @@ export default class MainPresenter {
   _closeAllPopups() {
     this._filmPresenters.forEach((value) => {
       if (value.isOpen) {
-        value._closePopup();
+        value.closePopup();
         value.isOpen = false;
       }
     });

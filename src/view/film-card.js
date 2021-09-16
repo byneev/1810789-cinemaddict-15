@@ -88,7 +88,7 @@ export default class FilmCard extends AbstractElement {
     this.getElement().querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this._clickWatchedHandler);
   }
 
-  getTemplate() {
+  _getTemplate() {
     return getFilmCard(this._film);
   }
 }

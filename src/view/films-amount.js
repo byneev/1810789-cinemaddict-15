@@ -8,7 +8,7 @@ export default class FilmsAmount extends AbstractElement {
     this._filmsCount = filmsCount;
   }
 
-  getTemplate() {
+  _getTemplate() {
     return getFilmsAmount(this._filmsCount);
   }
 }

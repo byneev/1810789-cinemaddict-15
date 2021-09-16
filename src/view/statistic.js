@@ -12,7 +12,7 @@ const getActualGenres = (films) => {
       if (!genresSet.has(genre)) {
         genresSet.add(genre);
       }
-    })
+    }),
   );
   return genresSet;
 };
@@ -101,14 +101,14 @@ export default class Statistic extends Smart {
     const data = this._filmsToData(value);
     this.updateData(data);
     this.initStats();
-    this.restoreHandlers();
+    this._restoreHandlers();
   }
 
   setStatsFilterClickHandler() {
     [...this.getElement().querySelectorAll('.statistic__filters-input')].forEach((element) => element.addEventListener('click', this._statsFilterClickHandler));
   }
 
-  restoreHandlers() {
+  _restoreHandlers() {
     [...this.getElement().querySelectorAll('.statistic__filters-input')].forEach((element) => element.addEventListener('click', this._statsFilterClickHandler));
   }
 
@@ -174,7 +174,7 @@ export default class Statistic extends Smart {
     const statisticChart = this.getElement().querySelector('.statistic__chart');
     statisticChart.style.height = `${BAR_HEIGHT * this._data.genresMap.length}px`;
 
-    const myChart = new Chart(statisticChart, {
+    new Chart(statisticChart, {
       plugins: [chartDataLabels],
       type: 'horizontalBar',
       data: {
@@ -238,7 +238,7 @@ export default class Statistic extends Smart {
     });
   }
 
-  getTemplate() {
+  _getTemplate() {
     return getStatistic(this._data);
   }
 }
