@@ -1,4 +1,4 @@
-import { DataType, FilterType, SortType, UpdateType } from '../constants.js';
+import { DataType, FilterType, SortType, UpdateType, MAX_FILMS_COUNT } from '../constants.js';
 import { remove, replace, sortByType } from '../utils/common.js';
 import { render, RenderPosition } from '../utils/render.js';
 import FilmListEmptyView from '../view/films-list-empty.js';
@@ -12,10 +12,11 @@ import { getCountByFilters } from '../utils/common.js';
 import LoadingPageView from '../view/loading-page.js';
 import FilmsAmountView from '../view/films-amount.js';
 import Adapter from '../utils/adapter.js';
+import StatisticView from '../view/statistic.js';
 
-const MAX_FILMS_COUNT = 5;
 export default class MainPresenter {
   constructor(mainContainer, headerContainer, filmsModel, filterModel, commentModel, api) {
+    this._totalFilmsCount = 0;
     this._isLoading = false;
     this._currentFilter = FilterType.ALL;
     this._currentSortType = SortType.DEFAULT;
@@ -32,6 +33,7 @@ export default class MainPresenter {
     this._filmsListComponent = new FilmsListView();
     this._filmListEmptyComponent = null;
     this._filmsAmountComponent = null;
+    this._statisticComponent = null;
     this._handleFilmViewAction = this._handleFilmViewAction.bind(this);
     this._closeAllPopups = this._closeAllPopups.bind(this);
     this._renderFilms = this._renderFilms.bind(this);
@@ -41,6 +43,7 @@ export default class MainPresenter {
     this._handleFilterModelEvent = this._handleFilterModelEvent.bind(this);
     this._handleSiteMenuViewAction = this._handleSiteMenuViewAction.bind(this);
     this._sortItemClickHandler = this._sortItemClickHandler.bind(this);
+    this._handleSiteMenuStatsClick = this._handleSiteMenuStatsClick.bind(this);
   }
 
   _getFilms() {
@@ -72,14 +75,16 @@ export default class MainPresenter {
   }
 
   _handleFilmViewAction(updateType, update, filterType = FilterType.ALL, filterUpdate) {
-    this._filterModel.updateFilters(filterType, filterUpdate);
+    this._filmPresenters.get(update.id).removeListeners();
     this._api.updateFilm(update).then((data) => {
       const film = Adapter.serverToClientData(data, DataType.FILM);
-      this._filmsModel.updateFilm(updateType, film);
+      this._filterModel.updateFilters(filterType, filterUpdate);
+      this._filmsModel.updateFilm(updateType, film, filterType, filterUpdate);
     });
   }
 
   _handleSiteMenuViewAction(filterType) {
+    this._currentSortType = SortType.DEFAULT;
     this._filterModel.setCurrentFilterType(filterType);
   }
 
@@ -96,6 +101,7 @@ export default class MainPresenter {
       return;
     }
     this._currentSortType = sortType;
+    this._renderedFilmsCount = MAX_FILMS_COUNT;
     this._clearBoard();
     this._renderBoard();
   }
@@ -109,6 +115,7 @@ export default class MainPresenter {
     replace(newSiteMenu, this._siteMenuComponent);
     this._siteMenuComponent = newSiteMenu;
     this._siteMenuComponent.setSiteMenuItemClickHandler(this._handleSiteMenuClick);
+    this._siteMenuComponent.setSiteMenuStatsClickHandler(this._handleSiteMenuStatsClick);
   }
 
   _replaceProfile() {
@@ -126,11 +133,12 @@ export default class MainPresenter {
         if (currentFilmPresenter.isOpen) {
           currentFilmPresenter._clearCommentsBlock();
           currentFilmPresenter._renderCommentsBlock(this._commentModel.getComments());
-          currentFilmPresenter._setScrollPopup(currentFilmPresenter._filmDetailsComponent.scrollTop);
+          currentFilmPresenter.setScrollPopup();
         }
         this._currentFilter = this._filterModel.getCurrentFilterType();
         this._replaceSiteMenu();
         this._replaceProfile();
+        currentFilmPresenter.setListeners();
         break;
       case UpdateType.MAJOR:
         this._closeAllPopups();
@@ -139,6 +147,7 @@ export default class MainPresenter {
         this._renderBoard();
         break;
       case UpdateType.INIT:
+        this._totalFilmsCount = this._filmsModel.getFilms().length;
         remove(this._loadingComponent);
         this._filterModel.setFilters(getCountByFilters(this._getFilms()));
         this._clearBoard();
@@ -150,7 +159,7 @@ export default class MainPresenter {
   _closeAllPopups() {
     this._filmPresenters.forEach((value) => {
       if (value.isOpen) {
-        value._closePopup();
+        value.closePopup();
         value.isOpen = false;
       }
     });
@@ -175,14 +184,32 @@ export default class MainPresenter {
     remove(this._sortViewComponent);
     remove(this._filmListEmptyComponent);
     remove(this._filmsAmountComponent);
+    remove(this._statisticComponent);
     this._filmPresenters.forEach((filmPresenter) => remove(filmPresenter._filmCardComponent));
     this._filmPresenters.clear();
   }
 
-  _renderSiteMenu() {
-    this._siteMenuComponent = new SiteMenuView(this._filterModel.getFilters(), this._currentFilter);
+  _renderSiteMenu(filter) {
+    this._siteMenuComponent = new SiteMenuView(this._filterModel.getFilters(), filter);
     this._siteMenuComponent.setSiteMenuItemClickHandler(this._handleSiteMenuClick);
+    this._siteMenuComponent.setSiteMenuStatsClickHandler(this._handleSiteMenuStatsClick);
     render(this._mainContainer, this._siteMenuComponent, RenderPosition.BEFOREEND);
+  }
+
+  _renderStatistic() {
+    this._currentSortType = SortType.DEFAULT;
+    this._statisticComponent = new StatisticView(this._filmsModel.getFilms());
+    this._statisticComponent.setStatsFilterClickHandler();
+    render(this._mainContainer, this._statisticComponent, RenderPosition.BEFOREEND);
+  }
+
+  _handleSiteMenuStatsClick() {
+    this._clearBoard();
+    this._renderProfile();
+    this._renderSiteMenu(FilterType.NONE);
+    this._renderStatistic();
+    this._statisticComponent.initStats();
+    this._renderFooter();
   }
 
   _renderProfile() {
@@ -196,20 +223,24 @@ export default class MainPresenter {
     render(this._mainContainer, this._sortViewComponent, RenderPosition.BEFOREEND);
   }
 
+  _renderFooter() {
+    this._footerContainer = document.querySelector('.footer__statistics');
+    this._filmsAmountComponent = new FilmsAmountView(this._totalFilmsCount);
+    render(this._footerContainer, this._filmsAmountComponent, RenderPosition.BEFOREEND);
+  }
+
   _renderBoard() {
     const films = this._getFilms();
     this._renderProfile();
-    this._renderSiteMenu();
+    this._renderSiteMenu(this._currentFilter);
     this._renderSort();
     render(this._mainContainer, this._filmsListComponent, RenderPosition.BEFOREEND);
     this._filmsListContainer = this._filmsListComponent.getElement().querySelector('.films-list__container');
-    this._footerContainer = document.querySelector('.footer__statistics');
     if (films.length === 0) {
       const siteMenuActiveItemHref = this._siteMenuComponent.getElement().querySelector('.main-navigation__item--active').getAttribute('href');
       this._filmListEmptyComponent = new FilmListEmptyView(siteMenuActiveItemHref);
       render(this._filmsListContainer, this._filmListEmptyComponent, RenderPosition.BEFOREEND);
-      this._filmsAmountComponent = new FilmsAmountView(films);
-      render(this._footerContainer, this._filmsAmountComponent, RenderPosition.BEFOREEND);
+      this._renderFooter();
       return;
     }
     this._renderFilms(films.slice(0, Math.min(films.length, this._renderedFilmsCount)));
@@ -218,8 +249,7 @@ export default class MainPresenter {
       render(this._filmsListContainer, this._moreButtonComponent, RenderPosition.AFTER);
       this._moreButtonComponent.setClickHandler(this._moreButtonClickHandler);
     }
-    this._filmsAmountComponent = new FilmsAmountView(films);
-    render(this._footerContainer, this._filmsAmountComponent, RenderPosition.BEFOREEND);
+    this._renderFooter();
   }
 
   _moreButtonClickHandler() {

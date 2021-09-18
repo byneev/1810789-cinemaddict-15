@@ -35,11 +35,11 @@ export default class Comment extends Smart {
   constructor(comment) {
     super();
     this._comment = comment;
-    this._data = this._commentToData();
+    this._data = this._convertCommentToData();
     this._commentDeleteHandler = this._commentDeleteHandler.bind(this);
   }
 
-  _commentToData() {
+  _convertCommentToData() {
     return Object.assign({}, this._comment, {
       isDisabling: false,
     });
@@ -58,11 +58,11 @@ export default class Comment extends Smart {
     this.getElement().querySelector('.film-details__comment-delete').addEventListener('click', this._commentDeleteHandler);
   }
 
-  restoreHandlers() {
+  _restoreHandlers() {
     this.getElement().querySelector('.film-details__comment-delete').addEventListener('click', this._commentDeleteHandler);
   }
 
-  getTemplate() {
+  _getTemplate() {
     return getComment(this._data);
   }
 }

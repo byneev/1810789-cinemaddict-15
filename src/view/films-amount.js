@@ -1,14 +1,14 @@
 import AbstractElement from './abstract-element.js';
 
-const getFilmsAmount = (films) => `<p>${films.length} movies inside</p>`;
+const getFilmsAmount = (filmsCount) => `<p>${filmsCount} movies inside</p>`;
 
 export default class FilmsAmount extends AbstractElement {
-  constructor(films) {
+  constructor(filmsCount) {
     super();
-    this._films = films;
+    this._filmsCount = filmsCount;
   }
 
-  getTemplate() {
-    return getFilmsAmount(this._films);
+  _getTemplate() {
+    return getFilmsAmount(this._filmsCount);
   }
 }

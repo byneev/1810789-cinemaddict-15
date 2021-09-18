@@ -7,7 +7,7 @@ const getFilmsList = () => `<section class="films"><section class="films-list">
 </section>`;
 
 export default class FilmsList extends AbstractElement {
-  getTemplate() {
+  _getTemplate() {
     return getFilmsList();
   }
 }

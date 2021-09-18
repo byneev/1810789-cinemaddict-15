@@ -28,7 +28,7 @@ export default class FilmListEmpty extends AbstractElement {
     this._activeMenuItem = activeMenuItem;
   }
 
-  getTemplate() {
+  _getTemplate() {
     return getFilmsList(this._activeMenuItem);
   }
 }

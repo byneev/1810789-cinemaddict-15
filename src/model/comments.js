@@ -1,10 +1,14 @@
-import { UpdateType } from '../constants.js';
+import { ActionType } from '../constants.js';
 import AbstractObserver from '../utils/abstract-observer.js';
 
 export default class Comments extends AbstractObserver {
   constructor() {
     super();
     this._comments = [];
+  }
+
+  getObserversCount() {
+    return this._observers.size;
   }
 
   setPresenter(presenter) {
@@ -15,17 +19,17 @@ export default class Comments extends AbstractObserver {
     return this._presenter;
   }
 
-  setComments(comments, updateType = UpdateType.PATCH) {
+  setComments(comments, actionType = ActionType.PATCH) {
     this._comments = comments;
-    this._notify(this._comments, updateType);
+    this._notify(this._comments, actionType);
   }
 
   getComments() {
     return this._comments;
   }
 
-  deleteComment(id, updateType) {
+  deleteComment(id, actionType) {
     this._comments = this._comments.filter((comment) => comment.id !== id);
-    this._notify(this._comments, updateType);
+    this._notify(this._comments, actionType);
   }
 }

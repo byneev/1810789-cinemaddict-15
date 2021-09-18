@@ -12,7 +12,7 @@ const getFilmCard = (film) => {
     <span class="film-card__genre">${genres.join(' ')}</span>
   </p>
   <img src="${poster}" alt="${title}" class="film-card__poster">
-  <p class="film-card__description">${description.length >= 140 ? `${description.substring(139)}...` : description}</p>
+  <p class="film-card__description">${description.length >= 140 ? `${description.substring(0, 139)}...` : description}</p>
   <a class="film-card__comments">${commentsList.length} comments</a>
   <div class="film-card__controls">
     <button class="film-card__controls-item film-card__controls-item--add-to-watchlist
@@ -34,6 +34,7 @@ export default class FilmCard extends AbstractElement {
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
     this._clickWatchlistHandler = this._clickWatchlistHandler.bind(this);
     this._clickWatchedHandler = this._clickWatchedHandler.bind(this);
+    this.removeListeners = this.removeListeners.bind(this);
   }
 
   _clickHandler(evt) {
@@ -63,6 +64,15 @@ export default class FilmCard extends AbstractElement {
     this.getElement().querySelector('.film-card__comments').addEventListener('click', this._clickHandler);
   }
 
+  removeListeners() {
+    this.getElement().querySelector('.film-card__title').removeEventListener('click', this._clickHandler);
+    this.getElement().querySelector('.film-card__poster').removeEventListener('click', this._clickHandler);
+    this.getElement().querySelector('.film-card__comments').removeEventListener('click', this._clickHandler);
+    this.getElement().querySelector('.film-card__controls-item--add-to-watchlist').removeEventListener('click', this._clickWatchlistHandler);
+    this.getElement().querySelector('.film-card__controls-item--favorite').removeEventListener('click', this._clickFavoriteHandler);
+    this.getElement().querySelector('.film-card__controls-item--mark-as-watched').removeEventListener('click', this._clickWatchedHandler);
+  }
+
   setFavoriteClickHandler(callback) {
     this._callback.clickFavorite = callback;
     this.getElement().querySelector('.film-card__controls-item--favorite').addEventListener('click', this._clickFavoriteHandler);
@@ -78,7 +88,7 @@ export default class FilmCard extends AbstractElement {
     this.getElement().querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this._clickWatchedHandler);
   }
 
-  getTemplate() {
+  _getTemplate() {
     return getFilmCard(this._film);
   }
 }
