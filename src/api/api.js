@@ -1,10 +1,19 @@
-import { DataType, MethodType } from './constants.js';
-import Adapter from './utils/adapter.js';
+import { DataType, MethodType } from '../constants.js';
+import Adapter from '../utils/adapter.js';
 
 export default class Api {
   constructor(autorization, adress) {
     this._authorization = autorization;
     this._adress = adress;
+  }
+
+  sinchronizeData(data) {
+    return this._load({
+      url: '/movies/sync',
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: new Headers({'Content-Type', 'application/json'})
+    })
   }
 
   getFilms() {

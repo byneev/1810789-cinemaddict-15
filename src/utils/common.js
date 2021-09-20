@@ -51,4 +51,6 @@ const sortByType = (films, sortType) => {
   }
 };
 
-export { getRandomInteger, getRandomFloat, generateValuesFromArray, createElement, remove, replace, updateArray, getCountByFilters, sortByType };
+const isOnline = () => window.navigator.onLine;
+
+export { getRandomInteger, getRandomFloat, generateValuesFromArray, createElement, remove, replace, updateArray, getCountByFilters, sortByType, isOnline };
