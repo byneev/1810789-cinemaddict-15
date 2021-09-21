@@ -39,6 +39,7 @@ self.addEventListener('install', (evt) => {
 self.addEventListener('activate', (evt) => {
   evt.waitUntil(
     caches.keys().then((keys) =>
+      // чекнуть адекватно ли работает удаление старых данных
       Promise.all(
         keys
           .map((key) => {

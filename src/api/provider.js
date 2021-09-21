@@ -1,3 +1,4 @@
+import { DataType } from '../constants';
 import Adapter from '../utils/adapter';
 import { isOnline } from '../utils/common.js';
 
@@ -19,19 +20,22 @@ export default class Provider {
   getFilms() {
     if (isOnline) {
       return this._api.getFilms().then((films) => {
-        this._store.setItems(covertDataForStore(films.map(Adapter.cLientToServerData)));
+        this._store.setItems(covertDataForStore(films.map((film) => Adapter.cLientToServerData(film, DataType.FILM))));
         return films;
       });
     }
 
-    const filmsList = this._store.getItems().values().map(Adapter.serverToClientData);
+    const filmsList = this._store
+      .getItems()
+      .values()
+      .map((film) => Adapter.serverToClientData(film, DataType.FILM));
     return Promise.resolve(filmsList);
   }
 
   updateFilm(update) {
     if (isOnline) {
       return this._api.updateFilm(update).then((updatedFilm) => {
-        this._store.setItem(updatedFilm.id, Adapter.cLientToServerData(updatedFilm));
+        this._store.setItem(updatedFilm.id, updatedFilm);
         return updatedFilm;
       });
     }

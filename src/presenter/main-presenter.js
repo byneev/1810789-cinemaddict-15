@@ -15,7 +15,7 @@ import Adapter from '../utils/adapter.js';
 import StatisticView from '../view/statistic.js';
 
 export default class MainPresenter {
-  constructor(mainContainer, headerContainer, filmsModel, filterModel, commentModel, api) {
+  constructor(mainContainer, headerContainer, filmsModel, filterModel, commentModel, api, provider) {
     this._totalFilmsCount = 0;
     this._isLoading = false;
     this._currentFilter = FilterType.ALL;
@@ -24,6 +24,7 @@ export default class MainPresenter {
     this._filmsModel = filmsModel;
     this._commentModel = commentModel;
     this._api = api;
+    this._provider = provider;
     this._renderedFilmsCount = MAX_FILMS_COUNT;
     this._filmPresenters = new Map();
     this._mainContainer = mainContainer;
@@ -64,7 +65,7 @@ export default class MainPresenter {
 
   init() {
     this._renderLoadingPage();
-    this._api.getFilms().then((films) => {
+    this._provider.getFilms().then((films) => {
       this._filmsModel.setFilms(films);
     });
     this._filmsModel.addObserver(this._handleFilmsModelEvent);
@@ -78,7 +79,7 @@ export default class MainPresenter {
 
   _handleFilmViewAction(updateType, update, filterType = FilterType.ALL, filterUpdate) {
     this._filmPresenters.get(update.id).removeListeners();
-    this._api.updateFilm(update).then((data) => {
+    this._provider.updateFilm(update).then((data) => {
       const film = Adapter.serverToClientData(data, DataType.FILM);
       this._filterModel.updateFilters(filterType, filterUpdate);
       this._filmsModel.updateFilm(updateType, film, filterType, filterUpdate);
@@ -232,6 +233,10 @@ export default class MainPresenter {
   }
 
   _renderBoard() {
+    //TODO
+    // Отобразить оффлайн тост и синхронизировать данные с сервером
+    // Отрисовка блоков most commented и top rated по 2 фильма в каждом
+    // Форматировать время в коментах (2 дня назад, только что etc)
     const films = this._getFilms();
     this._renderProfile();
     this._renderSiteMenu(this._currentFilter);

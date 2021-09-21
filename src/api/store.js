@@ -17,7 +17,7 @@ export default class Store {
   }
 
   setItem(key, value) {
-    const store = JSON.parse(this._storage.getItems());
+    const store = JSON.parse(this._storage.getItem(this._storageKey));
 
     this._storage.setItem(
       this._storageKey,
@@ -30,7 +30,7 @@ export default class Store {
   }
 
   removeItem(key) {
-    const store = JSON.parse(this._storage.getItems());
+    const store = JSON.parse(this._storage.getItem(this._storageKey));
     delete store[key];
 
     this._storage.setItem(this._storageKey, JSON.stringify(store));
