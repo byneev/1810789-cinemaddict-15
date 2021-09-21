@@ -79,7 +79,7 @@ export default class FilmPresenter {
       });
   }
 
-  _handleCommentAction(actionType, update = {}) {
+  _handleCommentAction(actionType, update) {
     const resetComment = this._resetElement(this._commentsMap.get(update));
     const resetNewComment = this._resetElement(this._savedNewComment);
 
@@ -94,12 +94,13 @@ export default class FilmPresenter {
             comment: this._savedNewComment.getData().description,
             emotion: this._savedNewComment.getData().emoji,
           })
-          .then((response) =>
+          .then((response) => {
+            response.comments.map((comment) => Adapter.serverToClientData(comment, DataType.COMMENT));
             this._commentModel.setComments(
               response.comments.map((comment) => Adapter.serverToClientData(comment, DataType.COMMENT)),
-              ActionType.ADD,
-            ),
-          )
+              ActionType.ADD
+            );
+          })
           .catch(() => {
             this._savedNewComment.snake(resetNewComment);
           });
@@ -124,16 +125,18 @@ export default class FilmPresenter {
 
   _handleCommentModelEvent(data, actionType) {
     const presenter = this._commentModel.getPresenter();
-    this._lastAction = actionType;
-    presenter._clearCommentsBlock();
-    presenter._renderCommentsBlock(data);
-    presenter.setScrollPopup();
+    if (actionType === ActionType.PATCH) {
+      presenter._clearCommentsBlock();
+      presenter._renderCommentsBlock(data);
+      presenter.setScrollPopup();
+    }
     if (actionType === ActionType.DELETE || actionType === ActionType.ADD) {
+      this._lastAction = actionType;
       presenter._filmsModel.updateFilm(
         UpdateType.MINOR,
         Object.assign({}, presenter._filmsModel.getFilmById(presenter._id), {
           commentsList: data,
-        }),
+        })
       );
     }
   }
@@ -218,7 +221,7 @@ export default class FilmPresenter {
         commentsList: this._commentModel.getComments().map((comment) => comment.id),
       }),
       FilterType.FAVORITES,
-      film.userDetails.isFavorite ? -1 : 1,
+      film.userDetails.isFavorite ? -1 : 1
     );
   }
 
@@ -237,7 +240,7 @@ export default class FilmPresenter {
         commentsList: this._commentModel.getComments().map((comment) => comment.id),
       }),
       FilterType.WATCHLIST,
-      film.userDetails.isInWatchlist ? -1 : 1,
+      film.userDetails.isInWatchlist ? -1 : 1
     );
   }
 
@@ -256,7 +259,7 @@ export default class FilmPresenter {
         commentsList: this._commentModel.getComments().map((comment) => comment.id),
       }),
       FilterType.HISTORY,
-      film.userDetails.isWatched ? -1 : 1,
+      film.userDetails.isWatched ? -1 : 1
     );
   }
 

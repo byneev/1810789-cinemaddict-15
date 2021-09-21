@@ -64,7 +64,9 @@ export default class Adapter {
       case DataType.COMMENT:
         newData = Object.assign({}, data, {
           date: dayjs(data.date).toISOString(),
+          comment: data.commentsList.message,
         });
+        delete newData.message;
         return newData;
     }
   }
@@ -102,6 +104,7 @@ export default class Adapter {
           message: data.comment,
           date: new Date(data.date),
         });
+        delete newData.comment;
         return newData;
     }
   }

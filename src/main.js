@@ -4,7 +4,7 @@ import SiteMenu from './model/site-menu.js';
 import Comments from './model/comments.js';
 import Api from './api/api.js';
 
-const AUTHORIZATION_KEY = 'Basic dfGpeSfgkQZGdfS';
+const AUTHORIZATION_KEY = 'Basic lfGpeRfgkUSFdfS';
 const SERVER_ADRESS = 'https://15.ecmascript.pages.academy/cinemaddict';
 
 const api = new Api(AUTHORIZATION_KEY, SERVER_ADRESS);

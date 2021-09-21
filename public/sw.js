@@ -60,13 +60,13 @@ const fetchHandler = (evt) => {
       if (response) {
         return response;
       }
-      return fetch(request).then((response) => {
-        if (!response || response.status !== HTTP_STATUS_OK || response.type !== RESPONSE_SAFE_TYPE) {
-          return response;
+      return fetch(request).then((data) => {
+        if (!data || data.status !== HTTP_STATUS_OK || data.type !== RESPONSE_SAFE_TYPE) {
+          return data;
         }
-        const clonedResponse = response.clone();
+        const clonedResponse = data.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(request, clonedResponse));
-        return response;
+        return data;
       });
     })
   );

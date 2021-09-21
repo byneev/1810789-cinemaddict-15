@@ -2,9 +2,9 @@ import { DataType, MethodType } from '../constants.js';
 import Adapter from '../utils/adapter.js';
 
 export default class Api {
-  constructor(autorization, adress) {
+  constructor(autorization, address) {
     this._authorization = autorization;
-    this._adress = adress;
+    this._address = address;
   }
 
   sinchronizeData(data) {
@@ -12,8 +12,8 @@ export default class Api {
       url: '/movies/sync',
       method: 'POST',
       body: JSON.stringify(data),
-      headers: new Headers({'Content-Type', 'application/json'})
-    })
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+    });
   }
 
   getFilms() {
@@ -55,7 +55,7 @@ export default class Api {
 
   _load({ url, method = MethodType.GET, body = null, headers = new Headers() }) {
     headers.append('Authorization', this._authorization);
-    return fetch(`${this._adress}/${url}`, {
+    return fetch(`${this._address}/${url}`, {
       method,
       body,
       headers,

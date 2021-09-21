@@ -64,7 +64,9 @@ export default class MainPresenter {
 
   init() {
     this._renderLoadingPage();
-    this._api.getFilms().then((films) => this._filmsModel.setFilms(films));
+    this._api.getFilms().then((films) => {
+      this._filmsModel.setFilms(films);
+    });
     this._filmsModel.addObserver(this._handleFilmsModelEvent);
     this._filterModel.addObserver(this._handleFilterModelEvent);
   }
