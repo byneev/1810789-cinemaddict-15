@@ -39,7 +39,6 @@ self.addEventListener('install', (evt) => {
 self.addEventListener('activate', (evt) => {
   evt.waitUntil(
     caches.keys().then((keys) =>
-      // чекнуть адекватно ли работает удаление старых данных
       Promise.all(
         keys
           .map((key) => {
@@ -56,18 +55,18 @@ self.addEventListener('activate', (evt) => {
 
 const fetchHandler = (evt) => {
   const { request } = evt;
-  evt.waitUntil(
-    caches.match(request).then((response) => {
-      if (response) {
-        return response;
+  evt.respondWith(
+    caches.match(request).then((cacheResponse) => {
+      if (cacheResponse) {
+        return cacheResponse;
       }
-      return fetch(request).then((data) => {
-        if (!data || data.status !== HTTP_STATUS_OK || data.type !== RESPONSE_SAFE_TYPE) {
-          return data;
+      return fetch(request).then((response) => {
+        if (!response || response.status !== HTTP_STATUS_OK || response.type !== RESPONSE_SAFE_TYPE) {
+          return response;
         }
-        const clonedResponse = data.clone();
+        const clonedResponse = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(request, clonedResponse));
-        return data;
+        return response;
       });
     })
   );

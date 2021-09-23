@@ -12,7 +12,7 @@ const getActualGenres = (films) => {
       if (!genresSet.has(genre)) {
         genresSet.add(genre);
       }
-    }),
+    })
   );
   return genresSet;
 };
@@ -164,7 +164,7 @@ export default class Statistic extends Smart {
       filmsCount: this._watchedFilms.length,
       filmsTime: [Math.floor(result / 60), result % 60],
       topGenre: topGenre,
-      profile: getProfileStatus(this._watchedFilms.length),
+      profile: getProfileStatus(this._films.length),
     };
   }
 

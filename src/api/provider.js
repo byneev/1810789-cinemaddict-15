@@ -17,8 +17,13 @@ export default class Provider {
     this._store = store;
   }
 
+  sync() {
+    const items = Object.values(this._store.getItems()); //получаем у стора текущие итемы в серверном формате
+    return this._api.sinchronizeData(items).then((films) => films.updated);
+  }
+
   getFilms() {
-    if (isOnline) {
+    if (isOnline()) {
       return this._api.getFilms().then((films) => {
         this._store.setItems(covertDataForStore(films.map((film) => Adapter.cLientToServerData(film, DataType.FILM))));
         return films;
@@ -33,14 +38,13 @@ export default class Provider {
   }
 
   updateFilm(update) {
-    if (isOnline) {
+    if (isOnline()) {
       return this._api.updateFilm(update).then((updatedFilm) => {
-        this._store.setItem(updatedFilm.id, updatedFilm);
+        this._store.setItem(updatedFilm.id, Adapter.cLientToServerData(updatedFilm, DataType.FILM));
         return updatedFilm;
       });
     }
-
-    this._store.setItem(update.id, Adapter.cLientToServerData(update));
+    this._store.setItem(update.id, Adapter.cLientToServerData(update, DataType.FILM));
     return Promise.resolve(update);
   }
 }

@@ -13,7 +13,7 @@ export default class Api {
       method: 'POST',
       body: JSON.stringify(data),
       headers: new Headers({ 'Content-Type': 'application/json' }),
-    });
+    }).then((response) => response.json());
   }
 
   getFilms() {
@@ -28,7 +28,9 @@ export default class Api {
       method: MethodType.PUT,
       body: JSON.stringify(Adapter.cLientToServerData(update, DataType.FILM)),
       headers: new Headers({ 'Content-Type': 'application/json' }),
-    }).then((response) => response.json());
+    })
+      .then((response) => response.json())
+      .then((film) => Adapter.serverToClientData(film, DataType.FILM));
   }
 
   getComments(id) {

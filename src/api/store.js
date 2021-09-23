@@ -18,7 +18,6 @@ export default class Store {
 
   setItem(key, value) {
     const store = JSON.parse(this._storage.getItem(this._storageKey));
-
     this._storage.setItem(
       this._storageKey,
       JSON.stringify(

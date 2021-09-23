@@ -1,8 +1,9 @@
 import dayjs from 'dayjs';
-import { DataType, FilterType, UpdateType, ActionType } from '../constants.js';
+import { DataType, FilterType, UpdateType, ActionType, ListType } from '../constants.js';
 import Adapter from '../utils/adapter.js';
-import { remove, replace } from '../utils/common.js';
+import { isOnline, remove, replace } from '../utils/common.js';
 import { render, RenderPosition } from '../utils/render.js';
+import { showToast } from '../utils/toast.js';
 import CommentView from '../view/comment.js';
 import CommentsBlockView from '../view/comments-block.js';
 import FilmCardView from '../view/film-card.js';
@@ -10,16 +11,20 @@ import FilmDetailsView from '../view/film-details.js';
 import NewCommentView from '../view/new-comment.js';
 
 export default class FilmPresenter {
-  constructor(container, changeData, closeAllPopups, filmsModel, filterModel, commentModel, api) {
+  constructor(changeData, closeAllPopups, filmsModel, filterModel, commentModel, api) {
     this.isOpen = false;
+    this.isInCommentedList = false;
+    this.isInRatedList = false;
+    this.isInList = false;
     this._filterModel = filterModel;
     this._filmsModel = filmsModel;
     this._commentModel = commentModel;
-    this._container = container;
     this._changeData = changeData;
     this._api = api;
     this._commentsMap = new Map();
     this._filmCardComponent = null;
+    this._filmCardRatedComponent = null;
+    this._filmCardCommentedComponent = null;
     this._filmDetailsComponent = null;
     this._savedNewComment = null;
     this._newCommentComponent = null;
@@ -41,29 +46,77 @@ export default class FilmPresenter {
     this._clearCommentsBlock = this._clearCommentsBlock.bind(this);
   }
 
-  init(filmData) {
+  init(filmData, container, listType = ListType.DEFAULT) {
     this._id = filmData.id;
-    const oldFilmCard = this._filmCardComponent;
-    this._filmCardComponent = new FilmCardView(filmData);
-    this.setListeners();
-
-    if (oldFilmCard === null) {
-      render(this._container, this._filmCardComponent, RenderPosition.BEFOREEND);
-      return;
+    let oldFilmCard;
+    switch (listType) {
+      case ListType.COMMENTED:
+        oldFilmCard = this._filmCardCommentedComponent;
+        this._filmCardCommentedComponent = new FilmCardView(filmData);
+        if (!this.isInCommentedList) {
+          render(container, this._filmCardCommentedComponent, RenderPosition.BEFOREEND);
+          this.isInCommentedList = true;
+          this.setListeners();
+          return;
+        }
+        replace(this._filmCardCommentedComponent, oldFilmCard);
+        break;
+      case ListType.RATED:
+        oldFilmCard = this._filmCardRatedComponent;
+        this._filmCardRatedComponent = new FilmCardView(filmData);
+        if (!this.isInRatedList) {
+          render(container, this._filmCardRatedComponent, RenderPosition.BEFOREEND);
+          this.isInRatedList = true;
+          this.setListeners();
+          return;
+        }
+        replace(this._filmCardRatedComponent, oldFilmCard);
+        break;
+      case ListType.DEFAULT:
+        oldFilmCard = this._filmCardComponent;
+        this._filmCardComponent = new FilmCardView(filmData);
+        if (oldFilmCard === null) {
+          render(container, this._filmCardComponent, RenderPosition.BEFOREEND);
+          this.isInList = true;
+          this.setListeners();
+          return;
+        }
+        replace(this._filmCardComponent, oldFilmCard);
+        break;
     }
-    replace(this._filmCardComponent, oldFilmCard);
-    remove(oldFilmCard);
   }
 
   removeListeners() {
-    this._filmCardComponent.removeListeners();
+    if (this._filmCardComponent !== null) {
+      this._filmCardComponent.removeListeners();
+    }
+    if (this._filmCardRatedComponent !== null) {
+      this._filmCardRatedComponent.removeListeners();
+    }
+    if (this._filmCardCommentedComponent !== null) {
+      this._filmCardCommentedComponent.removeListeners();
+    }
   }
 
   setListeners() {
-    this._filmCardComponent.setClickHandler(this._clickHandler);
-    this._filmCardComponent.setFavoriteClickHandler(this._clickFavoriteHandler);
-    this._filmCardComponent.setWatchlistClickHandler(this._clickWatchlistHandler);
-    this._filmCardComponent.setWatchedClickHandler(this._clickWatchedHandler);
+    if (this._filmCardComponent !== null) {
+      this._filmCardComponent.setClickHandler(this._clickHandler);
+      this._filmCardComponent.setFavoriteClickHandler(this._clickFavoriteHandler);
+      this._filmCardComponent.setWatchlistClickHandler(this._clickWatchlistHandler);
+      this._filmCardComponent.setWatchedClickHandler(this._clickWatchedHandler);
+    }
+    if (this._filmCardRatedComponent !== null) {
+      this._filmCardRatedComponent.setClickHandler(this._clickHandler);
+      this._filmCardRatedComponent.setFavoriteClickHandler(this._clickFavoriteHandler);
+      this._filmCardRatedComponent.setWatchlistClickHandler(this._clickWatchlistHandler);
+      this._filmCardRatedComponent.setWatchedClickHandler(this._clickWatchedHandler);
+    }
+    if (this._filmCardCommentedComponent !== null) {
+      this._filmCardCommentedComponent.setClickHandler(this._clickHandler);
+      this._filmCardCommentedComponent.setFavoriteClickHandler(this._clickFavoriteHandler);
+      this._filmCardCommentedComponent.setWatchlistClickHandler(this._clickWatchlistHandler);
+      this._filmCardCommentedComponent.setWatchedClickHandler(this._clickWatchedHandler);
+    }
   }
 
   _onEscapeKeydown(evt) {
@@ -143,6 +196,10 @@ export default class FilmPresenter {
 
   _newCommentKeydownHandler(evt) {
     if (evt.ctrlKey && evt.key === 'Enter') {
+      if (!isOnline()) {
+        showToast();
+        return;
+      }
       this._handleCommentAction(ActionType.ADD);
     }
     if (evt.key === 'Escape') {
@@ -203,6 +260,10 @@ export default class FilmPresenter {
   }
 
   _clickHandler() {
+    if (!isOnline()) {
+      showToast();
+      return;
+    }
     this._renderPopup(this._id);
   }
 

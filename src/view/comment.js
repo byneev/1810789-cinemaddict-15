@@ -1,17 +1,7 @@
-import dayjs from 'dayjs';
 import he from 'he';
-import { ONE_DAY_SECONDS, ONE_SECOND_MILLISECONDS } from '../constants.js';
+import { formatDateByOld, isOnline } from '../utils/common.js';
+import { showToast } from '../utils/toast.js';
 import Smart from './smart.js';
-
-const formatDateByOld = (date) => {
-  let result = dayjs(date).format('YYYY/MM/DD hh:mm');
-  const nowDate = dayjs().toDate();
-  const dateGapInDays = (nowDate - date) * ONE_DAY_SECONDS * ONE_SECOND_MILLISECONDS;
-  if (dateGapInDays < 5) {
-    result = `${Math.floor(dateGapInDays)} days ago`;
-  }
-  return result;
-};
 
 const getComment = (data) => {
   const { author, message, date, emotion, id, isDisabling } = data;
@@ -47,6 +37,10 @@ export default class Comment extends Smart {
 
   _commentDeleteHandler(evt) {
     evt.preventDefault();
+    if (!isOnline()) {
+      showToast();
+      return;
+    }
     this.updateData({
       isDisabling: true, // вернуть как удалится
     });

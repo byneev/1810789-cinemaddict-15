@@ -7,12 +7,12 @@ import Store from './api/store.js';
 import Provider from './api/provider.js';
 
 const AUTHORIZATION_KEY = 'Basic lfGpeRfgkUSFdfS';
-const SERVER_ADRESS = 'https://15.ecmascript.pages.academy/cinemaddict';
+const SERVER_ADDRESS = 'https://15.ecmascript.pages.academy/cinemaddict';
 const STORE_PREFIX = 'cinemaddict-localstorage';
 const STORE_VER = 'v15';
 const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
-const api = new Api(AUTHORIZATION_KEY, SERVER_ADRESS);
+const api = new Api(AUTHORIZATION_KEY, SERVER_ADDRESS);
 const store = new Store(STORE_NAME, window.localStorage);
 const provider = new Provider(api, store);
 
@@ -27,4 +27,13 @@ mainPresenter.init();
 
 window.addEventListener('load', () => {
   window.navigator.serviceWorker.register('/sw.js');
+});
+
+window.addEventListener('online', () => {
+  document.title = document.title.replace(' [offline]', '');
+  provider.sync();
+});
+
+window.addEventListener('offline', () => {
+  document.title += ' [offline]';
 });

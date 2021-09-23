@@ -1,11 +1,7 @@
 import { SortType } from '../constants.js';
 import AbstractElement from '../view/abstract-element';
-
-const getRandomInteger = (start = 0, end = 1) => Math.floor(start + Math.random() * (end - start + 1));
-
-const getRandomFloat = (start = 4, end = 10, count = 1) => (start + Math.random() * (end - start)).toFixed(count);
-
-const generateValuesFromArray = (array) => array.sort(() => Math.random() - Math.random()).slice(0, Math.floor(getRandomInteger(1, array.length / 3)));
+import { ONE_MINUTE_MILLISECONDS, ONE_HOUR_MILLISECONDS, ONE_DAY_MILLISECONDS, ONE_WEEK_MILLISECONDS, ONE_MONTH_MILLISECONDS, ONE_YEAR_MILLISECONDS, DateUnit } from '../constants.js';
+import dayjs from 'dayjs';
 
 const createElement = (template) => {
   const temp = document.createElement('div');
@@ -46,11 +42,44 @@ const sortByType = (films, sortType) => {
       return films.slice().sort((filmA, filmB) => filmB.realiseDate - filmA.realiseDate);
     case SortType.RATING:
       return films.slice().sort((filmA, filmB) => filmB.rating - filmA.rating);
+    case SortType.COMMENTS:
+      return films.slice().sort((filmA, filmB) => filmB.commentsList.length - filmA.commentsList.length);
     case SortType.DEFAULT:
       return films;
   }
 };
 
+const checkEqualArrays = (arrayA, arrayB) => {
+  const result = arrayA.filter((item) => !arrayB.includes(item));
+  return result.length === 0;
+};
+
 const isOnline = () => window.navigator.onLine;
 
-export { getRandomInteger, getRandomFloat, generateValuesFromArray, createElement, remove, replace, updateArray, getCountByFilters, sortByType, isOnline };
+const getDateString = (dateGap, dateUnit) => (dateGap === 1 ? `${dateGap} ${dateUnit} ago` : `${dateGap} ${dateUnit}s ago`);
+
+const formatDateByOld = (date) => {
+  const nowDate = dayjs().toDate();
+  const dateGap = nowDate - date;
+  if (dateGap < ONE_MINUTE_MILLISECONDS) {
+    return 'Now';
+  }
+  if (dateGap < ONE_HOUR_MILLISECONDS) {
+    return getDateString(Math.floor(dateGap / ONE_MINUTE_MILLISECONDS), DateUnit.MINUTE);
+  }
+  if (dateGap < ONE_DAY_MILLISECONDS) {
+    return getDateString(Math.floor(dateGap / ONE_HOUR_MILLISECONDS), DateUnit.HOUR);
+  }
+  if (dateGap < ONE_WEEK_MILLISECONDS) {
+    return getDateString(Math.floor(dateGap / ONE_DAY_MILLISECONDS), DateUnit.DAY);
+  }
+  if (dateGap < ONE_MONTH_MILLISECONDS) {
+    return getDateString(Math.floor(dateGap / ONE_WEEK_MILLISECONDS), DateUnit.WEEK);
+  }
+  if (dateGap < ONE_YEAR_MILLISECONDS) {
+    return getDateString(Math.floor(dateGap / ONE_MONTH_MILLISECONDS), DateUnit.MONTH);
+  }
+  return dayjs(date).format('YYYY/MM/DD hh:mm');
+};
+
+export { createElement, remove, replace, updateArray, getCountByFilters, sortByType, isOnline, formatDateByOld, checkEqualArrays };

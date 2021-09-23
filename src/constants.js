@@ -1,6 +1,11 @@
 export const DEFAULT_POPUP_SCROLL = 0;
-export const ONE_DAY_SECONDS = 84600;
 export const ONE_SECOND_MILLISECONDS = 1000;
+export const ONE_MINUTE_MILLISECONDS = 60 * ONE_SECOND_MILLISECONDS;
+export const ONE_HOUR_MILLISECONDS = 60 * ONE_MINUTE_MILLISECONDS;
+export const ONE_DAY_MILLISECONDS = 24 * ONE_HOUR_MILLISECONDS;
+export const ONE_WEEK_MILLISECONDS = 7 * ONE_DAY_MILLISECONDS;
+export const ONE_MONTH_MILLISECONDS = 30 * ONE_DAY_MILLISECONDS;
+export const ONE_YEAR_MILLISECONDS = 365 * ONE_DAY_MILLISECONDS;
 export const SNAKE_ANIMATION_TIMEOUT = 600;
 export const NOVICE_FILM_COUNT = 10;
 export const FAN_FILM_COUNT = 20;
@@ -21,6 +26,7 @@ export const SortType = {
   DEFAULT: 'default',
   DATE: 'date',
   RATING: 'rating',
+  COMMENTS: 'comments',
 };
 
 export const UpdateType = {
@@ -54,4 +60,18 @@ export const TimeFilterType = {
   WEEK: 'week',
   MONTH: 'month',
   YEAR: 'year',
+};
+
+export const DateUnit = {
+  MINUTE: 'minute',
+  HOUR: 'hour',
+  DAY: 'day',
+  WEEK: 'week',
+  MONTH: 'month',
+};
+
+export const ListType = {
+  DEFAULT: 'default',
+  COMMENTED: 'Most commented',
+  RATED: 'Top rated',
 };
