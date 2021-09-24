@@ -42,7 +42,7 @@ export default class Comment extends Smart {
       return;
     }
     this.updateData({
-      isDisabling: true, // вернуть как удалится
+      isDisabling: true,
     });
     this._callback.deleteHandler(evt);
   }
