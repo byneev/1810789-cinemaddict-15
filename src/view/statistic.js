@@ -12,7 +12,7 @@ const getActualGenres = (films) => {
       if (!genresSet.has(genre)) {
         genresSet.add(genre);
       }
-    })
+    }),
   );
   return genresSet;
 };

@@ -23,8 +23,8 @@ export default class Store {
       JSON.stringify(
         Object.assign({}, store, {
           [key]: value,
-        })
-      )
+        }),
+      ),
     );
   }
 

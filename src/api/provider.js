@@ -8,7 +8,7 @@ const covertDataForStore = (data) =>
       Object.assign({}, acc, {
         [current.id]: current,
       }),
-    {}
+    {},
   );
 
 export default class Provider {
@@ -18,7 +18,7 @@ export default class Provider {
   }
 
   sync() {
-    const items = Object.values(this._store.getItems()); //получаем у стора текущие итемы в серверном формате
+    const items = Object.values(this._store.getItems());
     return this._api.sinchronizeData(items).then((films) => films.updated);
   }
 
