@@ -15,6 +15,8 @@ const getFilmsList = (activeMenuItem) => {
     case '#favorites':
       message = 'There are no favorite movies now';
       break;
+    default:
+      message = 'Its only for check';
   }
   return `<section class="films">
   <section class="films-list">
